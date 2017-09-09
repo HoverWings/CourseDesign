@@ -1,0 +1,1033 @@
+﻿#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "newRoute.h"
+#include"newDayInfo.h"
+#include"newDayEXPInfo.h"
+
+MainWindow::MainWindow(QWidget *parent) :
+	QMainWindow(parent),
+	ui(new Ui::MainWindow)
+{
+	ui->setupUi(this);
+    ui->treeWidget->setColumnCount(1);
+    ui->treeWidget->setHeaderLabel(tr("Route"));
+    ui->tableWidget->setColumnCount(2);
+    ui->tableWidget->setRowCount(15);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "item" <<"information");
+    ui->tableWidget->verticalHeader()->setVisible(false);//hide vertical header
+    ui->tableWidget->setColumnWidth(0,200);
+    ui->tableWidget->setColumnWidth(1,200);
+
+    QTreeWidgetItem *All = new QTreeWidgetItem(ui->treeWidget,QStringList(QString("All")));
+	//file
+	this->setWindowTitle("个人自助游管理信息系统_Powered_By_Hover");
+    QObject::connect(ui->newRouteAction, SIGNAL(triggered()), this, SLOT(newRouteSlot()));
+    QObject::connect(ui->newDayInfoAction, SIGNAL(triggered()), this, SLOT(newDayInfoSlot()));
+    QObject::connect(ui->newDayEXPInfoAction, SIGNAL(triggered()), this, SLOT(newDayEXPInfoSlot()));
+
+    //QObject::connect(ui->exitAction,SIGNAL(triggered()),this,SLOT(close()));//是否判断未保存 人性化设计
+    //edit menu
+    QObject::connect(ui->deleteRouteAction, SIGNAL(triggered()), this, SLOT(deleteRouteSlot()));
+    QObject::connect(ui->deleteDayInfoAction, SIGNAL(triggered()), this, SLOT(deleteDayInfoSlot()));
+    QObject::connect(ui->deleteDayEXPInfoAction, SIGNAL(triggered()), this, SLOT(deleteDayEXPInfoSlot()));
+
+    //
+    QObject::connect(ui->showRouteAction, SIGNAL(triggered()), this, SLOT(showRouteslot()));
+    QObject::connect(ui->showDayInfoAction, SIGNAL(triggered()), this, SLOT(showDayInfoslot()));
+    QObject::connect(ui->showDayEXPInfoAction, SIGNAL(triggered()), this, SLOT(showDayEXPInfoslot()));
+    QObject::connect(ui->showAllAction, SIGNAL(triggered()), this, SLOT(showAllslot()));
+
+    QObject::connect(ui->saveToFileAction, SIGNAL(triggered()), this, SLOT(saveToFileSlot()));
+    QObject::connect(ui->loadFromFileAction, SIGNAL(triggered()), this, SLOT(loadFromFileSlot()));
+    QObject::connect(ui->treeWidget,SIGNAL(itemClicked(QTreeWidgetItem*,int)),this,SLOT(Show_info(QTreeWidgetItem* ,int)));//mouse click -> show information
+
+    QObject::connect(ui->modifyRouteAction,SIGNAL(triggered()),this,SLOT(modifyRouteSlot()));
+    QObject::connect(ui->modifyDayInfoAction,SIGNAL(triggered()),this,SLOT(modifyDayInfoSlot()));
+    QObject::connect(ui->modifyDayEXPInfoAction,SIGNAL(triggered()),this,SLOT(modifyDayEXPInfoSlot()));
+
+
+
+}
+
+
+void MainWindow::Mouse_position(QTreeWidgetItem* item)//get mouse position use three int to store
+{
+    now_index[0] = -1;//initialization
+    now_index[1] = -1;
+    now_index[2] = -1;
+    int i = 0;
+    QTreeWidgetItem* parent = item->parent();//get parent node
+    while(parent != NULL){//find all parents
+        now_index[i] = parent->indexOfChild(item);
+        i++;
+        item = parent;
+        parent = item->parent();
+    }
+   // qDebug()<<now_index[0]<<now_index[1]<<now_index[2];
+}
+void MainWindow::Show_info(QTreeWidgetItem* item,int n){//show details
+    Mouse_position(item);//get mouse position
+    //nothing
+    if(now_index[0] == -1 && now_index[1] == -1 && now_index[2] == -1)//未点击
+    {
+       return;
+    }
+    //route
+
+    if(now_index[0] != -1 && now_index[1] == -1 && now_index[2] == -1)
+    {
+        p_Route p1=hRoute;
+        //struct college_info* college_temp = head;
+        for(int i = 0; i < now_index[0]; ++i)
+        {//find position
+            p1 = p1->nextRoute;
+        }
+        if(p1 == NULL)
+        {
+            return ;
+        }
+
+        ui->tableWidget->setItem(0, 0, new QTableWidgetItem("行程编号"));//show information
+        ui->tableWidget->setItem(1, 0, new QTableWidgetItem("主要目的地"));
+        ui->tableWidget->setItem(2, 0, new QTableWidgetItem("目的地所属国家/省份"));
+        ui->tableWidget->setItem(3, 0, new QTableWidgetItem("最低温度"));
+        ui->tableWidget->setItem(4, 0, new QTableWidgetItem("最高温度"));
+        ui->tableWidget->setItem(5, 0, new QTableWidgetItem("推荐的着装"));
+        ui->tableWidget->setItem(6, 0, new QTableWidgetItem("大交通"));
+        ui->tableWidget->setItem(7, 0, new QTableWidgetItem("主要景点"));
+        ui->tableWidget->setItem(8, 0, new QTableWidgetItem("异地办理手续行程编号"));
+        ui->tableWidget->setItem(9, 0, new QTableWidgetItem("出发日期"));
+        ui->tableWidget->setItem(10, 0, new QTableWidgetItem("返回到达日期"));
+        ui->tableWidget->setItem(11, 0, new QTableWidgetItem("行程总天数"));
+        ui->tableWidget->setItem(12, 0, new QTableWidgetItem("行程总人数"));
+        ui->tableWidget->setItem(13, 0, new QTableWidgetItem("行程总费用"));
+
+        ui->tableWidget->setItem(0, 1, new QTableWidgetItem(QString::number(p1->routeNum, 10)));
+        ui->tableWidget->setItem(1, 1, new QTableWidgetItem(QString::fromUtf8(p1->routeName)));
+        ui->tableWidget->setItem(2, 1, new QTableWidgetItem(QString::fromUtf8(p1->routeCountry)));
+        ui->tableWidget->setItem(3, 1, new QTableWidgetItem(QString("%1").arg(p1->dressingIndex.minT)));
+        ui->tableWidget->setItem(4, 1, new QTableWidgetItem(QString("%1").arg(p1->dressingIndex.maxT)));
+        ui->tableWidget->setItem(5, 1, new QTableWidgetItem(QString::fromUtf8(p1->dressingIndex.recommendedDressing)));
+        ui->tableWidget->setItem(6, 1, new QTableWidgetItem(QString::fromUtf8(p1->bigTrans)));
+        ui->tableWidget->setItem(7, 1, new QTableWidgetItem(QString::fromUtf8(p1->mainScene)));
+        ui->tableWidget->setItem(8, 1, new QTableWidgetItem(QString::fromUtf8(p1->remoteNum)));
+        ui->tableWidget->setItem(9, 1, new QTableWidgetItem(QString::fromUtf8(p1->beginDate)));
+        ui->tableWidget->setItem(10, 1, new QTableWidgetItem(QString::fromUtf8(p1->arriveDate)));
+        ui->tableWidget->setItem(11, 1, new QTableWidgetItem(QString("%1").arg(p1->totalTime)));
+        ui->tableWidget->setItem(12, 1, new QTableWidgetItem(QString("%1").arg(p1->totalNum)));
+        ui->tableWidget->setItem(13, 1, new QTableWidgetItem(QString("%1").arg(p1->totalPrice)));
+
+
+    }
+
+    //DayInfo
+    if(now_index[0] != -1 && now_index[1] != -1 && now_index[2] == -1)
+    {
+        p_Route p1=hRoute;
+        for(int i = 0; i < now_index[1]; ++i)//find position
+        {
+            p1 = p1->nextRoute;
+        }
+        p_DayInfo  p2 = p1->hDayInfo;
+        for(int i = 0; i < now_index[0]; ++i)
+        {
+            p2 = p2->nextDayInfo;
+        }
+        if(p2 == NULL)
+        {
+            return ;
+        }
+        ui->tableWidget->setItem(0, 0, new QTableWidgetItem("所属行程编号"));//show information
+        ui->tableWidget->setItem(1, 0, new QTableWidgetItem("序号"));
+        ui->tableWidget->setItem(2, 0, new QTableWidgetItem("早餐地点"));
+        ui->tableWidget->setItem(3, 0, new QTableWidgetItem("上午景点"));
+        ui->tableWidget->setItem(4, 0, new QTableWidgetItem("午餐地点"));
+        ui->tableWidget->setItem(5, 0, new QTableWidgetItem("下午景点"));
+        ui->tableWidget->setItem(6, 0, new QTableWidgetItem("晚餐地点"));
+        ui->tableWidget->setItem(7, 0, new QTableWidgetItem("小交通"));
+        ui->tableWidget->setItem(8, 0, new QTableWidgetItem("住宿地点"));
+        ui->tableWidget->setItem(9, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(10, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(11, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(12, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(13, 0, new QTableWidgetItem(""));
+
+
+
+        ui->tableWidget->setItem(0, 1, new QTableWidgetItem(QString("%1").arg(p2->routeNum)));
+        ui->tableWidget->setItem(1, 1, new QTableWidgetItem(QString("%1").arg(p2->order)));
+        ui->tableWidget->setItem(2, 1, new QTableWidgetItem(QString::fromUtf8(p2->breakfastLoc)));
+        ui->tableWidget->setItem(3, 1, new QTableWidgetItem(QString::fromUtf8(p2->morningScene)));
+        ui->tableWidget->setItem(4, 1, new QTableWidgetItem(QString::fromUtf8(p2->LunchLoc)));
+        ui->tableWidget->setItem(5, 1, new QTableWidgetItem(QString::fromUtf8(p2->afternoonScene)));
+        ui->tableWidget->setItem(6, 1, new QTableWidgetItem(QString::fromUtf8(p2->dinnerLoc)));
+        ui->tableWidget->setItem(7, 1, new QTableWidgetItem(QString::fromUtf8(p2->transInfo)));
+        ui->tableWidget->setItem(8, 1, new QTableWidgetItem(QString::fromUtf8(p2->residence)));
+        ui->tableWidget->setItem(9, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(10, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(11, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(12, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(13, 1, new QTableWidgetItem(""));
+
+    }
+
+    //DayEXPInfo
+    if(now_index[0] != -1 && now_index[1] != -1 && now_index[2] != -1)
+    {
+        p_Route p1=hRoute;
+        for(int i = 0; i < now_index[2]; ++i)//find position
+        {
+            p1 = p1->nextRoute;
+        }
+        p_DayInfo  p2 = p1->hDayInfo;
+        for(int i = 0; i < now_index[1]; ++i)
+        {
+            p2 = p2->nextDayInfo;
+        }
+        p_DayEXPInfo p3=p2->hDayEXPInfo;
+        for(int i = 0; i < now_index[0]; ++i)
+        {
+            p3 = p3->nextDayEXPInfo;
+        }
+        if(p3==NULL)
+        {
+            return;
+        }
+        ui->tableWidget->setItem(0, 0, new QTableWidgetItem("所属行程编号"));//show information
+        ui->tableWidget->setItem(1, 0, new QTableWidgetItem("序号"));
+        ui->tableWidget->setItem(2, 0, new QTableWidgetItem("顺序号"));
+        ui->tableWidget->setItem(3, 0, new QTableWidgetItem("交易时间"));
+        ui->tableWidget->setItem(4, 0, new QTableWidgetItem("交易种类"));
+        ui->tableWidget->setItem(5, 0, new QTableWidgetItem("交易金额"));
+        ui->tableWidget->setItem(6, 0, new QTableWidgetItem("是否预支付"));
+        ui->tableWidget->setItem(7, 0, new QTableWidgetItem("支付方式"));
+        ui->tableWidget->setItem(8, 0, new QTableWidgetItem("住宿地点"));
+        ui->tableWidget->setItem(9, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(10, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(11, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(12, 0, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(13, 0, new QTableWidgetItem(""));
+
+
+        ui->tableWidget->setItem(0, 1, new QTableWidgetItem(QString("%1").arg(p3->routeNum)));
+        ui->tableWidget->setItem(1, 1, new QTableWidgetItem(QString("%1").arg(p2->order)));
+        ui->tableWidget->setItem(2, 1, new QTableWidgetItem(QString("%1").arg(p3->serialNum)));
+        ui->tableWidget->setItem(3, 1, new QTableWidgetItem(QString::fromUtf8(p3->TxTime)));
+        ui->tableWidget->setItem(4, 1, new QTableWidgetItem(QString::fromUtf8(p3->TxKind)));
+        ui->tableWidget->setItem(5, 1, new QTableWidgetItem(QString("%1").arg(p3->TxAmount)));
+        ui->tableWidget->setItem(6, 1, new QTableWidgetItem(QString::fromUtf8(p3->isPrepayment)));
+        ui->tableWidget->setItem(7, 1, new QTableWidgetItem(QString::fromUtf8(p3->payment)));
+        ui->tableWidget->setItem(8, 1, new QTableWidgetItem(QString::fromUtf8(p3->explain)));
+        ui->tableWidget->setItem(9, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(10, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(11, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(12, 1, new QTableWidgetItem(""));
+        ui->tableWidget->setItem(13, 1, new QTableWidgetItem(""));
+
+
+
+
+    }
+
+}
+
+MainWindow::~MainWindow()
+{
+	delete ui;
+}
+
+
+void MainWindow::newRouteSlot()
+{
+    newRoute* dialog = new newRoute;
+    dialog->show();//unmodal dialog
+    dialog->exec();//modal dialog
+    showTree();
+}
+
+void MainWindow::newDayInfoSlot()
+{
+	newDayInfo* dailog = new newDayInfo;
+    dailog->exec();//modal dialog
+    showTree();
+}
+
+
+void MainWindow::newDayEXPInfoSlot()
+{
+	newDayEXPInfo* dialog = new newDayEXPInfo;
+    //dialog->show();//unmodal dialog
+    dialog->exec();//modal dialog
+    showTree();
+}
+
+
+void MainWindow::showAllslot()
+{
+    showTree();
+	p_Route p1 = hRoute;
+	QMessageBox msgBox;
+	if (p1 == NULL)
+	{
+
+		msgBox.setText("当前无信息 输出错误");
+		msgBox.exec();
+		return;
+	}
+	QString str;
+	while (p1 != NULL)
+	{
+		//printf("%d\n",p1->routeNum);
+		str = str + QString("%1").arg(p1->routeNum) + "\n";
+		p_DayInfo p2 = p1->hDayInfo;
+		while (p2 != NULL)
+		{
+			//printf("\t%d\n", p2->order);
+			str = str + "\t" + QString("%1").arg(p2->order) + "\n";
+			p_DayEXPInfo p3 = p2->hDayEXPInfo;
+			while (p3 != NULL)
+			{
+				//printf("\t\t%d\n", p3->serialNum);
+				str = str + "\t\t" + QString("%1").arg(p3->serialNum) + "\n";
+				p3 = p3->nextDayEXPInfo;
+			}
+			p2 = p2->nextDayInfo;
+		}
+		p1 = p1->nextRoute;
+	}
+	msgBox.setText(str);
+	msgBox.exec();
+	return;
+}
+
+
+
+
+
+
+
+void MainWindow::deleteRouteSlot()
+{
+	deletedialog = new QDialog;
+	deletedialog->setWindowTitle("删除行程");
+	QGroupBox *box = new QGroupBox(this);
+	QPushButton *submitBtn = new QPushButton("确认");
+	QPushButton *cancelBtn = new QPushButton("取消");
+	connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_deleteRouteSlot()));
+	connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
+
+	QLabel *routNum = new QLabel("行程编号");
+	routeNumLineEdit = new QLineEdit;
+	QGridLayout *layout = new QGridLayout;
+	layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+	layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+
+	layout->addWidget(submitBtn, 1, 0, 1, 1);
+	layout->addWidget(cancelBtn, 1, 1, 1, 1);
+	box->setLayout(layout);
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(box);
+	deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+
+}
+
+void MainWindow::Act_deleteRouteSlot()
+{
+    int n1 = routeNumLineEdit->text().toInt();
+	QMessageBox msgBox;
+	clearSlot();
+	deletedialog->close();
+    if (deleteRoute(n1))
+	{
+        showTree();
+		msgBox.setText("删除成功");
+		msgBox.exec();
+		return;
+	}
+	else
+	{
+		msgBox.setText("删除失败");
+		msgBox.exec();
+		return;
+	}
+}
+
+
+void MainWindow::deleteDayInfoSlot()
+{
+	deletedialog = new QDialog;
+	deletedialog->setWindowTitle("删除每日信息");
+	QGroupBox *box = new QGroupBox(this);
+	QPushButton *submitBtn = new QPushButton("确认");
+	QPushButton *cancelBtn = new QPushButton("取消");
+	connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_deleteDayInfoSlot()));
+	connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
+
+	QLabel *routNum = new QLabel("行程编号");
+	routeNumLineEdit = new QLineEdit;
+	QLabel *order = new QLabel("序号");
+	orderLineEdit = new QLineEdit;
+	QGridLayout *layout = new QGridLayout;
+	layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+	layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+	layout->addWidget(order, 1, 0, 1, 1); //从哪里开始 跨度
+	layout->addWidget(orderLineEdit, 1, 1, 1, 1); //从哪里开始 跨度
+
+	layout->addWidget(submitBtn, 2, 0, 1, 1);
+	layout->addWidget(cancelBtn, 2, 1, 1, 1);
+	box->setLayout(layout);
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(box);
+	deletedialog->setLayout(mainLayout);
+	deletedialog->show();
+}
+
+void MainWindow::Act_deleteDayInfoSlot()
+{
+	QMessageBox msgBox;
+	int n1 = routeNumLineEdit->text().toInt();
+	int n2 = orderLineEdit->text().toInt();
+	clearSlot();
+	deletedialog->close();
+	if (deleteDayInfo(n1, n2))
+	{
+        showTree();
+		msgBox.setText("删除成功");
+		msgBox.exec();
+		return;
+	}
+	else
+	{
+		msgBox.setText("删除失败");
+		msgBox.exec();
+		return;
+	}
+}
+
+void MainWindow::deleteDayEXPInfoSlot()
+{
+	deletedialog = new QDialog;
+	deletedialog->setWindowTitle("删除每日信息");
+	QGroupBox *box = new QGroupBox(this);
+	QPushButton *submitBtn = new QPushButton("确认");
+	QPushButton *cancelBtn = new QPushButton("取消");
+	connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_deleteDayEXPInfoSlot()));
+	connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
+
+	QLabel *routNum = new QLabel("行程编号");
+	routeNumLineEdit = new QLineEdit;
+	QLabel *order = new QLabel("序号");
+	orderLineEdit = new QLineEdit;
+	QLabel *serial = new QLabel("");
+	serialNumLineEdit = new QLineEdit;
+	QGridLayout *layout = new QGridLayout;
+	layout->addWidget(routNum, 0, 0, 1, 1);
+	layout->addWidget(routeNumLineEdit, 0, 1, 1, 1);
+	layout->addWidget(order, 1, 0, 1, 1); //从哪里开始 跨度
+	layout->addWidget(orderLineEdit, 1, 1, 1, 1);
+	layout->addWidget(serial, 2, 0, 1, 1);
+	layout->addWidget(serialNumLineEdit, 2, 1, 1, 1);
+
+	layout->addWidget(submitBtn, 3, 0, 1, 1);
+	layout->addWidget(cancelBtn, 3, 1, 1, 1);
+	box->setLayout(layout);
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(box);
+	deletedialog->setLayout(mainLayout);
+	deletedialog->show();
+}
+
+void MainWindow::Act_deleteDayEXPInfoSlot()
+{
+	QMessageBox msgBox;
+	int n1 = routeNumLineEdit->text().toInt();
+	int n2 = orderLineEdit->text().toInt();
+	int n3 = serialNumLineEdit->text().toInt();
+	clearSlot();
+	deletedialog->close();
+	if (deleteDayEXPInfo(n1, n2, n3))
+    {showTree();
+        showTree();
+		msgBox.setText("删除成功");
+		msgBox.exec();
+		return;
+	}
+	else
+	{
+		msgBox.setText("删除失败");
+		msgBox.exec();
+		return;
+	}
+}
+
+
+void MainWindow::clearSlot()
+{
+	//routeNumLineEdit->clear();//不同槽之间需要调用
+	//orderLineEdit->clear();//不同槽之间需要调用
+	//serialNumLineEdit->clear();//不同槽之间需要调用
+}
+
+void MainWindow::quitBtnSLot()
+{
+	deletedialog->close();
+}
+
+void MainWindow::showRouteslot()
+{
+    showTree();
+	deletedialog = new QDialog;
+	deletedialog->setWindowTitle("查询行程");
+	QGroupBox *box = new QGroupBox(this);
+	QPushButton *submitBtn = new QPushButton("确认");
+	QPushButton *cancelBtn = new QPushButton("取消");
+	connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showRouteslot()));
+	connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtSlot()));
+
+	QLabel *routNum = new QLabel("行程编号");
+	routeNumLineEdit = new QLineEdit;
+	QGridLayout *layout = new QGridLayout;
+	layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+	layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+
+	layout->addWidget(submitBtn, 1, 0, 1, 1);
+	layout->addWidget(cancelBtn, 1, 1, 1, 1);
+	box->setLayout(layout);
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(box);
+	deletedialog->setLayout(mainLayout);
+	deletedialog->show();
+}
+
+void MainWindow::Act_showRouteslot()
+{
+	//clearSlot();
+	//deletedialog->close();
+    int n1 = routeNumLineEdit->text().toInt();
+	//查询信息并显示
+	QMessageBox msgBox;
+    p_Route p1 = findRouteByNum(n1);
+	if (p1 == NULL)
+	{
+		//clearSlot();
+		deletedialog->close();
+		msgBox.setText("NOT FOUND");
+		msgBox.exec();
+		return;
+	}
+	//clearSlot();  //此处有问题
+	deletedialog->close();
+
+	showDialog = new QDialog;
+	showDialog->setWindowTitle("行程信息");
+	QGroupBox *box = new QGroupBox(this);
+
+	//浩大的工程啊
+    QLabel *routeNum = new QLabel(QObject::tr("行程编号"));
+    QLabel *s_routeNum = new QLabel();//s代表show
+    QLabel *routeName = new QLabel("主要目的地名称");
+    QLabel *s_routeName = new QLabel();
+    QLabel *routeCountry = new QLabel("目的地所属国家/省份");
+    QLabel *s_routeCountry = new QLabel();
+    QLabel *minT = new QLabel("最低温度");
+    QLabel *s_minT = new QLabel();
+    QLabel *maxT = new QLabel("最高温度");
+    QLabel *s_maxT = new QLabel();
+    QLabel *recommendedDressing = new QLabel("推荐的着装");
+    QLabel *s_recommendedDressing = new QLabel();
+    QLabel *bigTrans = new QLabel("大交通");
+    QLabel *s_bigTrans = new QLabel();
+    QLabel *mainScene = new QLabel("主要景点");
+    QLabel *s_mainScene = new QLabel();
+    QLabel *remoteNum = new QLabel("异地办理手续行程编号");
+    QLabel *s_remoteNum = new QLabel();
+    QLabel *beginDate = new QLabel("出发日期");
+    QLabel *s_beginDate = new QLabel();
+    QLabel *arriveDate = new QLabel("返回到达日期");
+    QLabel *s_arriveDate = new QLabel();
+    QLabel *totalTime = new QLabel("行程总天数");
+    QLabel *s_totalTime = new QLabel();
+    QLabel *totalNum = new QLabel("行程总人数");
+    QLabel *s_totalNum = new QLabel();
+    QLabel *totalPrice = new QLabel("行程总费用");
+    QLabel *s_totalPrice = new QLabel();
+    //体力活
+
+	//str1=QString("%1").arg(p1->routeNum);
+	s_routeNum->setText(QString("%1").arg(p1->routeNum));
+	s_routeName->setText(QString::fromUtf8(p1->routeName));
+    s_routeCountry->setText(QString::fromUtf8(p1->routeCountry));
+    s_minT->setText(QString("%1").arg(p1->dressingIndex.minT));
+    s_maxT->setText(QString("%1").arg(p1->dressingIndex.maxT));
+    s_recommendedDressing->setText(QString::fromUtf8(p1->dressingIndex.recommendedDressing));
+    s_bigTrans->setText(QString::fromUtf8(p1->bigTrans));
+    s_mainScene->setText(QString::fromUtf8(p1->mainScene));
+    s_remoteNum->setText(QString::fromUtf8(p1->remoteNum));
+    s_beginDate->setText(QString::fromUtf8(p1->beginDate));
+    s_arriveDate->setText(QString::fromUtf8(p1->arriveDate));
+    s_totalTime->setText(QString("%1").arg(p1->totalTime));
+    s_totalNum->setText(QString("%1").arg(p1->totalNum));
+    s_totalPrice->setText(QString("%1").arg(p1->totalPrice));
+
+	//QLineEdit *route_routeNumLineEdit  = new QLineEdit();//注意声明形式
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routeNum, 0, 0, 1, 1);
+    layout->addWidget(s_routeNum, 0, 1, 1, 1);
+    layout->addWidget(routeName, 1, 0, 1, 1);
+    layout->addWidget(s_routeName, 1, 1, 1, 1);
+    layout->addWidget(routeCountry, 2, 0, 1, 1);
+    layout->addWidget(s_routeCountry, 2, 1, 1, 1);
+    layout->addWidget(minT, 3, 0, 1, 1);
+    layout->addWidget(s_minT, 3, 1, 1, 1);
+    layout->addWidget(maxT, 4, 0, 1, 1);
+    layout->addWidget(s_maxT, 4, 1, 1, 1);
+    layout->addWidget(recommendedDressing, 5, 0, 1, 1);
+    layout->addWidget(s_recommendedDressing, 5, 1, 1, 1);
+    layout->addWidget(bigTrans, 6, 0, 1, 1);
+    layout->addWidget(s_bigTrans, 6, 1, 1, 1);
+    layout->addWidget(mainScene, 7, 0, 1, 1);
+    layout->addWidget(s_mainScene, 7, 1, 1, 1);
+    layout->addWidget(remoteNum, 8, 0, 1, 1);
+    layout->addWidget(s_remoteNum, 8, 1, 1, 1);
+    layout->addWidget(beginDate, 9, 0, 1, 1);
+    layout->addWidget(s_beginDate, 9, 1, 1, 1);
+    layout->addWidget(arriveDate, 10, 0, 1, 1);
+    layout->addWidget(s_arriveDate, 10, 1, 1, 1);
+    layout->addWidget(totalTime, 11, 0, 1, 1);
+    layout->addWidget(s_totalTime, 11, 1, 1, 1);
+    layout->addWidget(totalNum, 12, 0, 1, 1);
+    layout->addWidget(s_totalNum, 12, 1, 1, 1);
+    layout->addWidget(totalPrice, 13,0, 1, 1);
+    layout->addWidget(s_totalPrice, 13, 1, 1, 1);
+
+    box->setLayout(layout);
+	QGridLayout *mainLayout = new QGridLayout;
+	mainLayout->addWidget(box);
+	showDialog->setLayout(mainLayout);
+	showDialog->show();
+}
+
+
+void MainWindow::showDayInfoslot()
+{
+    deletedialog = new QDialog;
+    deletedialog->setWindowTitle("删除每日信息");
+    QGroupBox *box = new QGroupBox(this);
+    QPushButton *submitBtn = new QPushButton("确认");
+    QPushButton *cancelBtn = new QPushButton("取消");
+    connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showDayInfoSlot()));
+    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
+
+    QLabel *routNum = new QLabel("行程编号");
+    routeNumLineEdit = new QLineEdit;
+    QLabel *order = new QLabel("序号");
+    orderLineEdit = new QLineEdit;
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+    layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+    layout->addWidget(order, 1, 0, 1, 1); //从哪里开始 跨度
+    layout->addWidget(orderLineEdit, 1, 1, 1, 1); //从哪里开始 跨度
+
+    layout->addWidget(submitBtn, 2, 0, 1, 1);
+    layout->addWidget(cancelBtn, 2, 1, 1, 1);
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+}
+
+
+void MainWindow::Act_showDayInfoSlot()
+{
+    QMessageBox msgBox;
+    int n1 = routeNumLineEdit->text().toInt();
+    int n2 = orderLineEdit->text().toInt();
+    clearSlot();
+    p_DayInfo p2=findDayInfoByOrder(n1,n2);
+    if (p2 == NULL)
+    {
+        //clearSlot();
+        deletedialog->close();
+        msgBox.setText("NOT FOUND");
+        msgBox.exec();
+        return;
+    }
+    //clearSlot();  //此处有问题
+    deletedialog->close();
+
+    showDialog = new QDialog;
+    showDialog->setWindowTitle("行程信息");
+    QGroupBox *box = new QGroupBox(this);
+
+    //浩大的工程啊
+    QLabel *routeNum = new QLabel(QObject::tr("所属行程编号"));
+    QLabel *s_routeNum = new QLabel();//s代表show
+    QLabel *order = new QLabel(QObject::tr("序号"));
+    QLabel *s_order = new QLabel();//s代表show
+    QLabel *breakfastLoc = new QLabel("早餐地点");
+    QLabel *s_breakfastLoc = new QLabel();
+    QLabel *morningScene = new QLabel("上午景点");
+    QLabel *s_morningScene = new QLabel();
+    QLabel *LunchLoc = new QLabel("午餐地点");
+    QLabel *s_LunchLoc = new QLabel();
+    QLabel *afternoonScene = new QLabel("下午景点");
+    QLabel *s_afternoonScene = new QLabel();
+    QLabel *dinnerLoc = new QLabel("晚餐地点");
+    QLabel *s_dinnerLoc = new QLabel();
+    QLabel *transInfo = new QLabel("小交通");
+    QLabel *s_transInfo = new QLabel();
+    QLabel *residence = new QLabel("住宿地点");
+    QLabel *s_residence = new QLabel();
+
+
+
+    //str1=QString("%1").arg(p1->routeNum);
+    s_routeNum->setText(QString("%1").arg(p2->routeNum));
+    s_order->setText(QString("%1").arg(p2->order));
+    s_breakfastLoc->setText(QString::fromUtf8(p2->breakfastLoc));
+    s_morningScene->setText(QString::fromUtf8(p2->morningScene));
+    s_LunchLoc->setText(QString::fromUtf8(p2->LunchLoc));
+    s_afternoonScene->setText(QString::fromUtf8(p2->afternoonScene));
+    s_dinnerLoc->setText(QString::fromUtf8(p2->dinnerLoc));
+    s_transInfo->setText(QString::fromUtf8(p2->transInfo));
+    s_residence->setText(QString::fromUtf8(p2->residence));
+
+
+    //QLineEdit *route_routeNumLineEdit  = new QLineEdit();//注意声明形式
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routeNum, 0, 0, 1, 1);
+    layout->addWidget(s_routeNum, 0, 1, 1, 1);
+    layout->addWidget(order, 1, 0, 1, 1);
+    layout->addWidget(s_order, 1, 1, 1, 1);
+    layout->addWidget(breakfastLoc, 2, 0, 1, 1);
+    layout->addWidget(s_breakfastLoc, 2, 1, 1, 1);
+    layout->addWidget(morningScene, 3, 0, 1, 1);
+    layout->addWidget(s_morningScene, 3, 1, 1, 1);
+    layout->addWidget(LunchLoc, 4, 0, 1, 1);
+    layout->addWidget(s_LunchLoc, 4, 1, 1, 1);
+    layout->addWidget(afternoonScene, 5, 0, 1, 1);
+    layout->addWidget(s_afternoonScene, 5, 1, 1, 1);
+    layout->addWidget(dinnerLoc, 6, 0, 1, 1);
+    layout->addWidget(s_dinnerLoc, 6, 1, 1, 1);
+    layout->addWidget(transInfo, 7, 0, 1, 1);
+    layout->addWidget(s_transInfo, 7, 1, 1, 1);
+    layout->addWidget(residence, 8, 0, 1, 1);
+    layout->addWidget(s_residence, 8, 1, 1, 1);
+
+
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    showDialog->setLayout(mainLayout);
+    showDialog->show();
+
+}
+
+void MainWindow::showDayEXPInfoslot()
+{
+    deletedialog = new QDialog;
+    deletedialog->setWindowTitle("删除每日信息");
+    QGroupBox *box = new QGroupBox(this);
+    QPushButton *submitBtn = new QPushButton("确认");
+    QPushButton *cancelBtn = new QPushButton("取消");
+    connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showDayEXPInfoSlot()));
+    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
+
+    QLabel *routNum = new QLabel("行程编号");
+    routeNumLineEdit = new QLineEdit;
+    QLabel *order = new QLabel("序号");
+    orderLineEdit = new QLineEdit;
+    QLabel *serial = new QLabel("序列号");
+    serialNumLineEdit = new QLineEdit;
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routNum, 0, 0, 1, 1);
+    layout->addWidget(routeNumLineEdit, 0, 1, 1, 1);
+    layout->addWidget(order, 1, 0, 1, 1); //从哪里开始 跨度
+    layout->addWidget(orderLineEdit, 1, 1, 1, 1);
+    layout->addWidget(serial, 2, 0, 1, 1);
+    layout->addWidget(serialNumLineEdit, 2, 1, 1, 1);
+
+    layout->addWidget(submitBtn, 3, 0, 1, 1);
+    layout->addWidget(cancelBtn, 3, 1, 1, 1);
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+}
+
+void MainWindow::Act_showDayEXPInfoSlot()
+{
+    QMessageBox msgBox;
+    int n1 = routeNumLineEdit->text().toInt();
+    int n2 = orderLineEdit->text().toInt();
+    int n3 = serialNumLineEdit->text().toInt();
+    clearSlot();
+    deletedialog->close();
+    p_DayEXPInfo p3=findDayEXPInfoByserialNum(n1,n2,n3);
+    if (p3==NULL)
+    {
+        msgBox.setText("NOT FOUND");
+        msgBox.exec();
+        return;
+    }
+
+    //clearSlot();  //此处有问题
+    deletedialog->close();
+
+    showDialog = new QDialog;
+    showDialog->setWindowTitle("消费信息");
+    QGroupBox *box = new QGroupBox(this);
+
+    //浩大的工程啊
+    QLabel *routeNum = new QLabel(QObject::tr("所属行程编号"));
+    QLabel *s_routeNum = new QLabel();//s代表show
+    QLabel *order = new QLabel(QObject::tr("序号"));
+    QLabel *s_order = new QLabel();//s代表show
+    QLabel *serialNum = new QLabel("顺序号");
+    QLabel *s_serialNum = new QLabel();
+    QLabel *TxTime = new QLabel("交易时间");
+    QLabel *s_TxTime = new QLabel();
+    QLabel *TxKind = new QLabel("交易种类");
+    QLabel *s_TxKind = new QLabel();
+    QLabel *TxAmount = new QLabel("交易金额");
+    QLabel *s_TxAmount = new QLabel();
+    QLabel *isPrepayment = new QLabel("是否预支付");
+    QLabel *s_isPrepayment = new QLabel();
+    QLabel *payment = new QLabel("支付方式");
+    QLabel *s_payment = new QLabel();
+    QLabel *explain = new QLabel("住宿地点");
+    QLabel *s_explain = new QLabel();
+
+
+
+    //str1=QString("%1").arg(p1->routeNum);
+    s_routeNum->setText(QString("%1").arg(p3->routeNum));
+    s_order->setText(QString("%1").arg(p3->order));
+    s_serialNum->setText(QString("%1").arg(p3->serialNum));
+    s_TxTime->setText(QString::fromUtf8(p3->TxTime));
+    s_TxKind->setText(QString::fromUtf8(p3->TxKind));
+    s_TxAmount->setText(QString("%1").arg(p3->TxAmount));
+    s_isPrepayment->setText(QString::fromUtf8(p3->isPrepayment));
+    s_payment->setText(QString::fromUtf8(p3->payment));
+    s_explain->setText(QString::fromUtf8(p3->explain));
+
+
+    //QLineEdit *route_routeNumLineEdit  = new QLineEdit();//注意声明形式
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routeNum, 0, 0, 1, 1);
+    layout->addWidget(s_routeNum, 0, 1, 1, 1);
+    layout->addWidget(order, 1, 0, 1, 1);
+    layout->addWidget(s_order, 1, 1, 1, 1);
+    layout->addWidget(serialNum, 2, 0, 1, 1);
+    layout->addWidget(s_serialNum, 2, 1, 1, 1);
+    layout->addWidget(TxTime, 3, 0, 1, 1);
+    layout->addWidget(s_TxTime, 3, 1, 1, 1);
+    layout->addWidget(TxKind, 4, 0, 1, 1);
+    layout->addWidget(s_TxKind, 4, 1, 1, 1);
+    layout->addWidget(TxAmount, 5, 0, 1, 1);
+    layout->addWidget(s_TxAmount, 5, 1, 1, 1);
+    layout->addWidget(isPrepayment, 6, 0, 1, 1);
+    layout->addWidget(s_isPrepayment, 6, 1, 1, 1);
+    layout->addWidget(payment, 7, 0, 1, 1);
+    layout->addWidget(s_payment, 7, 1, 1, 1);
+    layout->addWidget(explain, 8, 0, 1, 1);
+    layout->addWidget(s_explain, 8, 1, 1, 1);
+
+
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    showDialog->setLayout(mainLayout);
+    showDialog->show();
+}
+
+//还需要错误判断
+void MainWindow::saveToFileSlot()
+{
+    QMessageBox msgBox;
+    if(saveToFile())
+    {
+        msgBox.setText("Save To File Successfully");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        msgBox.setText("Save To File Fail");
+        msgBox.exec();
+        return;
+    }
+}
+
+void MainWindow::loadFromFileSlot()//注意第一次保存
+{
+    QMessageBox msgBox;
+    if(loadFromFile())
+    {
+        showTree();
+        msgBox.setText("load From File Successfully");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        showTree();
+        msgBox.setText("load From File fail");
+        msgBox.exec();
+        return;
+    }
+}
+
+void MainWindow::showTree()
+{
+    ui->treeWidget->clear();//first clear old tree
+    QTreeWidgetItem *All = new QTreeWidgetItem(ui->treeWidget,QStringList(QString("All")));
+    p_Route p1 = hRoute;
+    if (p1 == NULL)
+    {
+        return;
+    }
+    QString str;
+    while (p1 != NULL)
+    {
+        QTreeWidgetItem *routeItem = new QTreeWidgetItem(QStringList("Route"+QString::number(p1->routeNum, 10)));
+        All->addChild(routeItem);
+        p_DayInfo p2 = p1->hDayInfo;
+        while (p2 != NULL)
+        {
+            QTreeWidgetItem *dayInfoItem = new QTreeWidgetItem(QStringList("DayInfo"+QString::number(p2->order, 10)));
+            routeItem->addChild(dayInfoItem);
+            p_DayEXPInfo p3 = p2->hDayEXPInfo;
+            while (p3 != NULL)
+            {
+                str = str + "\t\t" + QString("%1").arg(p3->serialNum) + "\n";
+                QTreeWidgetItem *dayEXPInfoItem = new QTreeWidgetItem(QStringList("DayEXPInfo"+QString::number(p3->serialNum, 10)));
+                dayInfoItem->addChild(dayEXPInfoItem);
+                p3 = p3->nextDayEXPInfo;
+            }
+            p2 = p2->nextDayInfo;
+        }
+        p1 = p1->nextRoute;
+    }
+    ui->treeWidget->expandAll();//expend all nodes
+    return;
+}
+
+
+void MainWindow::modifyRouteSlot()
+{
+    //qDebug() << ui->tableWidget->item(0,1)->text();
+}
+
+void MainWindow::modifyDayInfoSlot()
+{
+
+}
+
+void MainWindow::modifyDayEXPInfoSlot()
+{
+
+}
+
+
+void MainWindow::on_modifyButton_clicked()
+{
+    //Mouse_position(item);//get mouse position
+    if(now_index[0] == -1 && now_index[1] == -1 && now_index[2] == -1)//未点击
+    {
+       return;
+    }
+    //Route
+    if(now_index[0] != -1 && now_index[1] == -1 && now_index[2] == -1)
+    {
+        p_Route p1=hRoute;
+        //struct college_info* college_temp = head;
+        for(int i = 0; i < now_index[0]; ++i)
+        {//find position
+            p1 = p1->nextRoute;
+        }
+        if(p1 == NULL)
+        {
+            return ;
+        }
+
+        p1->routeNum=ui->tableWidget->item(0,1)->text().toInt();//int
+        strcpy(p1->routeName, ui->tableWidget->item(1,1)->text().toStdString().c_str());
+        strcpy(p1->routeCountry, ui->tableWidget->item(2,1)->text().toStdString().c_str());
+        p1->dressingIndex.minT=ui->tableWidget->item(3,1)->text().toInt();
+        p1->dressingIndex.maxT=ui->tableWidget->item(4,1)->text().toInt();
+        strcpy(p1->dressingIndex.recommendedDressing, ui->tableWidget->item(5,1)->text().toStdString().c_str());
+        strcpy(p1->bigTrans, ui->tableWidget->item(6,1)->text().toStdString().c_str());
+        strcpy(p1->mainScene, ui->tableWidget->item(7,1)->text().toStdString().c_str());
+        strcpy(p1->remoteNum, ui->tableWidget->item(8,1)->text().toStdString().c_str());
+        strcpy(p1->beginDate, ui->tableWidget->item(9,1)->text().toStdString().c_str());
+        strcpy(p1->arriveDate, ui->tableWidget->item(10,1)->text().toStdString().c_str());
+        p1->totalTime=ui->tableWidget->item(11,1)->text().toInt();//int  这个也是输入的
+        p1->totalNum=ui->tableWidget->item(12,1)->text().toInt();//int
+        p1->totalPrice=ui->tableWidget->item(13,1)->text().toFloat();//float
+
+    }
+    //DayInfo
+    if(now_index[0] != -1 && now_index[1] != -1 && now_index[2] == -1)
+    {
+        p_Route p1=hRoute;
+        for(int i = 0; i < now_index[1]; ++i)//find position
+        {
+            p1 = p1->nextRoute;
+        }
+        p_DayInfo  p2 = p1->hDayInfo;
+        for(int i = 0; i < now_index[0]; ++i)
+        {
+            p2 = p2->nextDayInfo;
+        }
+        if(p2 == NULL)
+        {
+            return ;
+        }
+        p2->routeNum=ui->tableWidget->item(0,1)->text().toInt();//int
+        p2->order=ui->tableWidget->item(1,1)->text().toInt();//int
+        strcpy(p2->breakfastLoc, ui->tableWidget->item(2,1)->text().toStdString().c_str());
+        strcpy(p2->morningScene, ui->tableWidget->item(3,1)->text().toStdString().c_str());
+        strcpy(p2->LunchLoc, ui->tableWidget->item(4,1)->text().toStdString().c_str());
+        strcpy(p2->afternoonScene, ui->tableWidget->item(5,1)->text().toStdString().c_str());
+        strcpy(p2->dinnerLoc, ui->tableWidget->item(6,1)->text().toStdString().c_str());
+        strcpy(p2->transInfo, ui->tableWidget->item(7,1)->text().toStdString().c_str());
+        strcpy(p2->residence, ui->tableWidget->item(8,1)->text().toStdString().c_str());
+    }
+    //DayEXPInfo
+    if(now_index[0] != -1 && now_index[1] != -1 && now_index[2] != -1)
+    {
+        p_Route p1=hRoute;
+        for(int i = 0; i < now_index[2]; ++i)//find position
+        {
+            p1 = p1->nextRoute;
+        }
+        p_DayInfo  p2 = p1->hDayInfo;
+        for(int i = 0; i < now_index[1]; ++i)
+        {
+            p2 = p2->nextDayInfo;
+        }
+        p_DayEXPInfo p3=p2->hDayEXPInfo;
+        for(int i = 0; i < now_index[0]; ++i)
+        {
+            p3 = p3->nextDayEXPInfo;
+        }
+        if(p3==NULL)
+        {
+            return;
+        }
+        p3->routeNum=ui->tableWidget->item(0,1)->text().toInt();//int
+        p3->order=ui->tableWidget->item(1,1)->text().toInt();//int
+        p3->serialNum=ui->tableWidget->item(2,1)->text().toInt();//int
+        strcpy(p3->TxTime, ui->tableWidget->item(3,1)->text().toStdString().c_str());
+        strcpy(p3->TxKind, ui->tableWidget->item(4,1)->text().toStdString().c_str());
+        p3->TxAmount=ui->tableWidget->item(5,1)->text().toFloat();//float
+        strcpy(p3->isPrepayment, ui->tableWidget->item(6,1)->text().toStdString().c_str());
+        strcpy(p3->payment, ui->tableWidget->item(7,1)->text().toStdString().c_str());
+        strcpy(p3->explain, ui->tableWidget->item(8,1)->text().toStdString().c_str());
+    }
+    showTree();
+}
