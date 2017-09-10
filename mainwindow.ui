@@ -103,11 +103,18 @@
     <addaction name="modifyDayInfoAction"/>
     <addaction name="modifyDayEXPInfoAction"/>
    </widget>
+   <widget class="QMenu" name="menu_S">
+    <property name="title">
+     <string>统计（&amp;S）</string>
+    </property>
+    <addaction name="countEXPAction"/>
+   </widget>
    <addaction name="menu_F"/>
    <addaction name="menu_I"/>
    <addaction name="menu_D"/>
    <addaction name="menu_M"/>
    <addaction name="menu_Q"/>
+   <addaction name="menu_S"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -196,6 +203,11 @@
   <action name="modifyDayEXPInfoAction">
    <property name="text">
     <string>修改消费信息(&amp;E)</string>
+   </property>
+  </action>
+  <action name="countEXPAction">
+   <property name="text">
+    <string>统计费用信息(&amp;E)</string>
    </property>
   </action>
  </widget>

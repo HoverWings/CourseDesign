@@ -10,7 +10,6 @@
 #include<stdbool.h> //使得bool合法
 
 
-
 #define _CRT_SECURE_NO_WARNINGS
 
 
@@ -29,12 +28,12 @@ typedef struct Route //行程一级链表结构体
     char routeName[20];//主要目的地名称
     char routeCountry[20];//目的地所属国家/省份
     DressingIndex dressingIndex;
-    char bigTrans[10];//大交通 主要交通
-    char mainScene[10];//主要景点
+    char bigTrans[20];//大交通 主要交通
+    char mainScene[200];//主要景点
     char remoteNum[10];//异地办理手续行程编号 此处更改为char
                   //如需异地面签或提交材料，给出异地办手续的行程编号，否则为空
-    char beginDate[8];//出发日期
-    char arriveDate[8];//返回到达日期
+    char beginDate[20];//出发日期
+    char arriveDate[20];//返回到达日期
     int totalTime;//行程总天数
     int totalNum;//行程总人数
     float totalPrice;//行程总费用
@@ -78,12 +77,12 @@ typedef struct DayEXPInfo //每天消费信息
     //char routeNum[10];//所属行程编号
     int order;//序号 2代表第二天
     int serialNum;//顺序号
-    char TxTime[4];//交易时间
-    char TxKind[4];//交易种类
+    char TxTime[8];//交易时间
+    char TxKind[8];//交易种类
     float TxAmount;//交易金额
-    char isPrepayment[1];//是否预支付
-    char payment[1];//支付方式
-    char explain[50];//住宿地点
+    char isPrepayment[4];//是否预支付
+    char payment[4];//支付方式
+    char explain[50];//说明
     struct DayEXPInfo* nextDayEXPInfo;
     //此处可否使用bool
 }DayEXPInfo, *p_DayEXPInfo;

@@ -66,6 +66,8 @@ private slots:
     void modifyDayInfoSlot();
     void modifyDayEXPInfoSlot();
 
+    void countEXPSlot();
+
     void Mouse_position(QTreeWidgetItem* item);
     void Show_info(QTreeWidgetItem* item,int n);
 

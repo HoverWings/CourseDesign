@@ -1,4 +1,4 @@
-#ifndef NEWROUTE_H
+﻿#ifndef NEWROUTE_H
 #define NEWROUTE_H
 
 #include <QDialog>
@@ -8,8 +8,9 @@
 #include"PersonalTrip.h"
 #include"mainwindow.h"
 
-namespace Ui {
-class newRoute;
+namespace Ui
+{
+    class newRoute;
 }
 
 class newRoute : public QDialog

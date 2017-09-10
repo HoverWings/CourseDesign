@@ -67,7 +67,7 @@ bool insertRoute(p_Route* curRoute) //当前节点
               // should never be reached
               break;
         }
-        /*if(true)
+         /*if(true)
         {
             (*curRoute)->nextRoute=(pre)->nextRoute->nextRoute;
             free((pre)->nextRoute);
@@ -258,11 +258,7 @@ bool printRoute()
     }
 }
 
-//
-//bool deleteRoute()
-//{
-//
-//}
+
 
 bool findDayInfoByOrder(p_Route route, p_DayInfo cur, p_DayInfo* pre, p_DayInfo* tail)//删除第几天
 {
@@ -898,6 +894,11 @@ bool loadFromFile()
     return true;
 }
 
+
+bool sortByEXP()
+{
+
+}
 
 
 
