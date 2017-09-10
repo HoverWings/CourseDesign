@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT  += charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -43,3 +44,6 @@ FORMS += \
     newRoute.ui \
     newDayInfo.ui \
     newDayEXPInfo.ui
+
+
+

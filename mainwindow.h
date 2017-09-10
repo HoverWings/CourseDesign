@@ -18,6 +18,9 @@
 #include"newDayEXPInfo.h"
 #include"personaltrip.h"
 
+#include <QtWidgets>
+#include <QtCharts>//use this to draw pie pict
+
 namespace Ui
 {
     class MainWindow;
