@@ -13,6 +13,7 @@
 #include<QGridLayout>
 #include<QPushButton>
 #include<QDebug>
+#include<string>
 #include"newRoute.h"
 #include"newDayInfo.h"
 #include"newDayEXPInfo.h"
@@ -74,6 +75,12 @@ private slots:
 
     void Mouse_position(QTreeWidgetItem* item);
     void Show_info(QTreeWidgetItem* item,int n);
+
+    void showTransInfoSlot();
+    void Act_showTransInfoSlot();
+
+    void showResidenceSlot();
+    void Act_showResidenceSlot();
 
 
 

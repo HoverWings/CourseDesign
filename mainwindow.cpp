@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->modifyDayEXPInfoAction,SIGNAL(triggered()),this,SLOT(modifyDayEXPInfoSlot()));
 
     QObject::connect(ui->countEXPAction,SIGNAL(triggered()),this,SLOT(countEXPSlot()));
+    QObject::connect(ui->showTransInfoAction,SIGNAL(triggered()),this,SLOT(showTransInfoSlot()));
+    QObject::connect(ui->showResidenceAction,SIGNAL(triggered()),this,SLOT(showResidenceSlot()));
+
 
 
 
@@ -226,10 +229,6 @@ void MainWindow::Show_info(QTreeWidgetItem* item,int n){//show details
         ui->tableWidget->setItem(11, 1, new QTableWidgetItem(""));
         ui->tableWidget->setItem(12, 1, new QTableWidgetItem(""));
         ui->tableWidget->setItem(13, 1, new QTableWidgetItem(""));
-
-
-
-
     }
 
 }
@@ -1071,6 +1070,7 @@ void MainWindow::countEXPSlot()
     tableWidget->setItem(5, 0, new QTableWidgetItem("门票"));
     tableWidget->setItem(6, 0, new QTableWidgetItem("购物"));
     tableWidget->setItem(7, 0, new QTableWidgetItem("其他"));
+    tableWidget->setItem(8, 0, new QTableWidgetItem("总计"));
 
 
     //QPieSlice *slice_red = series->slices().at(0);
@@ -1169,8 +1169,10 @@ void MainWindow::countEXPSlot()
        t1++;
     }
     p1=hRoute;
+    int index_mostTickets=1;
     for(int i=1;i<t1;i++)
     {
+
         chart[i]=new QChart();
         series[i]= new QPieSeries();
         tableWidget->setItem(0, i, new QTableWidgetItem(QString("%1").arg(p1->routeNum)));
@@ -1182,6 +1184,7 @@ void MainWindow::countEXPSlot()
         tableWidget->setItem(6, i, new QTableWidgetItem(QString("%1").arg(shopping[i])));
         tableWidget->setItem(7, i, new QTableWidgetItem(QString("%1").arg(others[i])));
         total=residence[i]+bigTrans[i]+littleTrans[i]+food[i]+tickets[i]+shopping[i]+others[i];
+        tableWidget->setItem(8, i, new QTableWidgetItem(QString("%1").arg(total)));
         pp_residence=residence[i]/total*100;
         pp_bigTrans=bigTrans[i]/total*100;
         pp_litteTrans=littleTrans[i]/total*100;
@@ -1204,15 +1207,123 @@ void MainWindow::countEXPSlot()
         chartview[i]= new QChartView(chart[i]);
         chartview[i]->setRenderHint(QPainter::Antialiasing);
         layout->addWidget(chartview[i],0,i);
-         p1=p1->nextRoute;
+        p1->totalPrice=total;
+        if(tickets[i]>index_mostTickets)
+        {
+            index_mostTickets=i;
+        }
+        p1=p1->nextRoute;
     }
-
+    tableWidget->setItem(9, 0, new QTableWidgetItem("门票价格最高的是"));
+    tableWidget->setItem(9, 1, new QTableWidgetItem(tableWidget->item(0,index_mostTickets)->text()));
+    tableWidget->setItem(9, 2, new QTableWidgetItem(QString("%1").arg(tickets[index_mostTickets])+"元"));
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(box);
     showDialog->setLayout(mainLayout);
     showDialog->show();
     //进行统计图表输出QThanzi
 }
+
+void MainWindow::showTransInfoSlot()
+{
+    deletedialog = new QDialog;
+    deletedialog->setWindowTitle("查询小交通信息");
+    QGroupBox *box = new QGroupBox(this);
+    QPushButton *submitBtn = new QPushButton("确认");
+    QPushButton *cancelBtn = new QPushButton("取消");
+    connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showTransInfoSlot()));
+    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtSlot()));
+
+    QLabel *routNum = new QLabel("景点名称");
+    routeNumLineEdit = new QLineEdit;
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+    layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+
+    layout->addWidget(submitBtn, 1, 0, 1, 1);
+    layout->addWidget(cancelBtn, 1, 1, 1, 1);
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+}
+
+
+void MainWindow::Act_showTransInfoSlot()
+{
+    QMessageBox msgBox;
+    char Scene[50];
+    strcpy(Scene, routeNumLineEdit->text().toStdString().c_str());
+    deletedialog->close();
+    p_DayInfo tp2=findTransInfoByScene(Scene);
+    if (tp2!=NULL)
+    {
+        msgBox.setText("小交通信息："+QString::fromUtf8(tp2->transInfo));
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        msgBox.setText("查找失败");
+        msgBox.exec();
+        return;
+    }
+}
+
+void MainWindow::showResidenceSlot()
+{
+    deletedialog = new QDialog;
+    deletedialog->setWindowTitle("查询小交通信息");
+    QGroupBox *box = new QGroupBox(this);
+    QPushButton *submitBtn = new QPushButton("确认");
+    QPushButton *cancelBtn = new QPushButton("取消");
+    connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showResidenceSlot()));
+    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtSlot()));
+
+    QLabel *routNum = new QLabel("景点名称");
+    routeNumLineEdit = new QLineEdit;
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
+    layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
+
+    layout->addWidget(submitBtn, 1, 0, 1, 1);
+    layout->addWidget(cancelBtn, 1, 1, 1, 1);
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+}
+
+void MainWindow::Act_showResidenceSlot()
+{
+    QMessageBox msgBox;
+    char Residence[50];
+    strcpy(Residence, routeNumLineEdit->text().toStdString().c_str());
+    deletedialog->close();
+    float EXP=findEXPByResidence(Residence);
+    if (EXP!=-1)
+    {
+        EXP+=1;
+        msgBox.setText(QString::fromUtf8(Residence)+"价格："+QString("%1").arg(EXP));
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        msgBox.setText("无查找旅店");
+        msgBox.exec();
+        return;
+    }
+}
+
+
+
+
+
+
+
 
 
 

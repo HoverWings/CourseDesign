@@ -806,27 +806,15 @@ bool loadFromFile()
                }
                else
                {
-                   p_DayInfo pre_p2=p1->hDayInfo;
-                   if(pre_p2->nextDayInfo!=NULL)
+                   p_DayInfo tp2=p1->hDayInfo;
+                   p_DayInfo pre=p1->hDayInfo;
+                   while(tp2->nextDayInfo!=NULL)
                    {
-                       if(pre_p2->nextDayInfo->order==p2->order)
-                       {
-                            pre_p2->nextDayInfo=p2;
-                       }
-                       else
-                       {
-                            pre_p2=pre_p2->nextDayInfo;
-                            if(pre_p2==NULL)
-                            {
-                                return false;
-                            }
-                       }
+                       pre=tp2;
+                       tp2=tp2->nextDayInfo;
                    }
-                   else
-                   {
-                        return false;
-                   }
-
+                    pre->nextDayInfo=p2;
+                    break;
                }
             }
             else
@@ -886,9 +874,14 @@ bool loadFromFile()
                 else
                 {
                     tp2=tp2->nextDayInfo;
+                    if(tp2==NULL)
+                    {
+                        return false;
+                    }
                 }
 
             }
+            p1=p1->nextRoute;
         }
 
     }
@@ -896,24 +889,121 @@ bool loadFromFile()
 }
 
 
-bool sortByRouteNum()
+p_DayInfo findTransInfoByScene(char Scene[50])
 {
     p_Route p1=hRoute;
-    if(p1==NULL)
+    if(hRoute==NULL)
+    {
+        return NULL;
+    }
+    while(p1!=NULL)
+    {
+        p_DayInfo p2=p1->hDayInfo;
+        while(p2!=NULL)
+        {
+            if(strcmp(p2->morningScene, Scene)==0||strcmp(p2->afternoonScene, Scene)==0)
+            {
+                return p2;
+            }
+            p2=p2->nextDayInfo;
+        }
+        p1=p1->nextRoute;
+    }
+    return NULL;
+}
+
+float findEXPByResidence(char Residence[50])
+{
+    p_Route p1=hRoute;
+    float residenceEXP=-1;
+    if(hRoute==NULL)
+    {
+        return residenceEXP;
+    }
+    while(p1!=NULL)
+    {
+        p_DayInfo p2=p1->hDayInfo;
+        while(p2!=NULL)
+        {
+            if(strcmp(p2->residence, Residence)==0)
+            {
+                p_DayEXPInfo p3=p2->hDayEXPInfo;
+                while(p3!=NULL)
+                {
+                    if(strcmp(p3->TxKind, "住宿")==0)
+                    {
+                         residenceEXP+=p3->TxAmount;
+                    }
+                    p3=p3->nextDayEXPInfo;
+                }
+
+            }
+            p2=p2->nextDayInfo;
+        }
+        p1=p1->nextRoute;
+    }
+    return residenceEXP;
+}
+
+/*
+bool sortByRouteNum(p_Route * head,p_Route *end)//quick sort
+{
+    if(hRoute==NULL)
     {
         return false;
     }
-    while(p1->nextRoute!=NULL)
+    p_Route p1=hRoute->nextRoute;
+    p_Route* small;
+    (*small)=p_Route;
+    while( p1 != NULL)
     {
-
+        if( p1 -> routeNum < p_Route -> routeNum)
+        {
+            small = small -> nextRoute;//对于小于轴的元素放在左边
+            t = small -> data;
+            small -> data = p -> data;
+            p -> data = t;
+        }
+        p = p -> next;
     }
+
+    sortByRouteNum(head,small);
+    sortByRouteNum(small->nextRoute,small);
 }
 
-bool sortByOrder();
+
+void quicksort(Linklist head, Linklist end)
+{
+    if(head == NULL || head == end)             //如果头指针为空或者链表为空，直接返回
+        return ;
+    int t;
+    Linklist p = head -> next;                  //用来遍历的指针
+    Linklist small = head;
+    while( p != end){
+        if( p -> data < head -> data){      //对于小于轴的元素放在左边
+            small = small -> next;
+            t = small -> data;
+            small -> data = p -> data;
+            p -> data = t;
+        }
+        p = p -> next;
+    }
+    t = head -> data;                           //遍历完后，对左轴元素与small指向的元素交换
+    head -> data = small -> data;
+    small -> data = t;
+    quicksort(head, small);                     //对左右进行递归
+    quicksort(small -> next, end);
+}
+
+bool swapRoute(p_Route *p1,p_Route * p2)
+{
+
+}
+
+bool sortByOrder(p_DayInfo *p2);
 bool sortBySerialNum();
 
-
-
+*/
 
 
 

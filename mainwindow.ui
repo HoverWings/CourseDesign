@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>771</width>
-    <height>431</height>
+    <width>974</width>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>30</x>
       <y>40</y>
-      <width>181</width>
-      <height>291</height>
+      <width>361</width>
+      <height>591</height>
      </rect>
     </property>
     <column>
@@ -32,18 +32,18 @@
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>400</x>
       <y>40</y>
-      <width>421</width>
-      <height>221</height>
+      <width>551</width>
+      <height>461</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="modifyButton">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>300</y>
+      <x>650</x>
+      <y>520</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -58,7 +58,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>771</width>
+     <width>974</width>
      <height>23</height>
     </rect>
    </property>
@@ -94,6 +94,9 @@
     <addaction name="showDayInfoAction"/>
     <addaction name="showDayEXPInfoAction"/>
     <addaction name="showAllAction"/>
+    <addaction name="showTransInfoAction"/>
+    <addaction name="showResidenceAction"/>
+    <addaction name="showDressingIndexAction"/>
    </widget>
    <widget class="QMenu" name="menu_M">
     <property name="title">
@@ -208,6 +211,21 @@
   <action name="countEXPAction">
    <property name="text">
     <string>统计费用信息(&amp;E)</string>
+   </property>
+  </action>
+  <action name="showTransInfoAction">
+   <property name="text">
+    <string>查询小交通信息</string>
+   </property>
+  </action>
+  <action name="showResidenceAction">
+   <property name="text">
+    <string>查询旅社信息</string>
+   </property>
+  </action>
+  <action name="showDressingIndexAction">
+   <property name="text">
+    <string>查询穿衣指数</string>
    </property>
   </action>
  </widget>

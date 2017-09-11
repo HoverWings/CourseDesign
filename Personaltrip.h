@@ -129,6 +129,9 @@ bool sortByRouteNum();
 bool sortByOrder();
 bool sortBySerialNum();
 
+p_DayInfo findTransInfoByScene(char Scene[50]);
+float findEXPByResidence(char Residence[50]);
+
 
 
 
