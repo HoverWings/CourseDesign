@@ -20,6 +20,7 @@
 
 #include <QtWidgets>
 #include <QtCharts>//use this to draw pie pict
+#include <QPieSeries>
 
 namespace Ui
 {

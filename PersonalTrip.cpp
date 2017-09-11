@@ -847,58 +847,70 @@ bool loadFromFile()
             break;
         }
         p3->nextDayEXPInfo=NULL;
-        if (!feof(in3))
+        p1=hRoute;
+        while (p1 != NULL)
         {
-            p1=hRoute;
-            while (p1 != NULL)
+            if (p1->routeNum==p3->routeNum)
             {
-                if (p1->routeNum==p3->routeNum)
+                p_DayInfo tp2=p1->hDayInfo;
+                if(tp2->order==p3->order)
                 {
-                    p_DayInfo tp2=p1->hDayInfo;
-                    if(tp2->order==p3->order)
+                    p_DayEXPInfo tp3=tp2->hDayEXPInfo;
+                    if(tp3==NULL)
                     {
-                        p_DayEXPInfo pre_p3=tp2->hDayEXPInfo;
-                        if(pre_p3==NULL)
-                        {
-                               tp2->hDayEXPInfo=p3;
-                               break;
-                        }
-                        else
-                        {
-                            if(pre_p3->nextDayEXPInfo->serialNum==p3->serialNum)
-                            {
-                                 pre_p3->nextDayEXPInfo=p3;
-                            }
-                            else
-                            {
-                                 pre_p3=pre_p3->nextDayEXPInfo;
-                                 if(pre_p3==NULL)
-                                 {
-                                     return false;
-                                 }
-                            }
-                        }
-
-
+                           tp2->hDayEXPInfo=p3;
+                           break;
                     }
                     else
                     {
-                        tp2=tp2->nextDayInfo;
+                          if(tp3->nextDayEXPInfo==NULL)
+                          {
+                                tp3->nextDayEXPInfo=p3;
+                          }
+                          else
+                          {
+                              p_DayEXPInfo pre=NULL;
+                                while(tp3->nextDayEXPInfo!=NULL)
+                                {
+                                    pre=tp3;
+                                    tp3=tp3->nextDayEXPInfo;
+
+                                }
+                                pre->nextDayEXPInfo=p3;
+                                 break;
+                          }
                     }
 
-                }
-            }
 
+                }
+                else
+                {
+                    tp2=tp2->nextDayInfo;
+                }
+
+            }
         }
+
     }
     return true;
 }
 
 
-bool sortByEXP()
+bool sortByRouteNum()
 {
+    p_Route p1=hRoute;
+    if(p1==NULL)
+    {
+        return false;
+    }
+    while(p1->nextRoute!=NULL)
+    {
 
+    }
 }
+
+bool sortByOrder();
+bool sortBySerialNum();
 
 
 

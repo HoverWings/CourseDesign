@@ -78,7 +78,7 @@ typedef struct DayEXPInfo //每天消费信息
     int order;//序号 2代表第二天
     int serialNum;//顺序号
     char TxTime[8];//交易时间
-    char TxKind[8];//交易种类
+    char TxKind[16];//交易种类
     float TxAmount;//交易金额
     char isPrepayment[4];//是否预支付
     char payment[4];//支付方式
@@ -124,6 +124,10 @@ bool loadFromFile();
 
 
 bool printAll();
+
+bool sortByRouteNum();
+bool sortByOrder();
+bool sortBySerialNum();
 
 
 

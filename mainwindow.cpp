@@ -1072,13 +1072,24 @@ void MainWindow::countEXPSlot()
     tableWidget->setItem(6, 0, new QTableWidgetItem("购物"));
     tableWidget->setItem(7, 0, new QTableWidgetItem("其他"));
 
-    QPieSeries *series = new QPieSeries();
+
     //QPieSlice *slice_red = series->slices().at(0);
     //QPieSlice *slice_green = series->slices().at(1);
     //QPieSlice *slice_blue = series->slices().at(2);
     //slice_red->setColor(QColor(255,0,0,255));
     //slice_green->setColor(QColor(0,255,0,255));
     //slice_blue->setColor(QColor(0,0,255,255));
+    QChart *chart[10];//最多显示10个图表
+    QPieSeries *series[10];
+    QChartView *chartview[10];
+
+    showDialog = new QDialog;
+    showDialog->setWindowTitle("行程信息");
+    QGroupBox *box = new QGroupBox(this);
+    QGridLayout *layout = new QGridLayout;
+    box->setLayout(layout);
+    layout->addWidget(tableWidget,0,0);
+
 
 
     p_Route p1 = hRoute;
@@ -1094,7 +1105,6 @@ void MainWindow::countEXPSlot()
 
        //return;
     }
-    QString str;
     while (p1 != NULL)
     {
        //str = str + QString("%1").arg(p1->routeNum) + "\n";
@@ -1109,92 +1119,94 @@ void MainWindow::countEXPSlot()
                if(strcmp(p3->TxKind, "住宿")==0)
                {
                     residence[t1]+=p3->TxAmount;
-                    break;
                }
-               if(strcmp(p3->TxKind, "大交通")==0)
+               else
                {
-                    bigTrans[t1]+=p3->TxAmount;
-                    break;
+                   if(strcmp(p3->TxKind, "大交通")==0)
+                   {
+                        bigTrans[t1]+=p3->TxAmount;
+                   }
+                   else
+                   {
+                       if(strcmp(p3->TxKind, "小交通")==0)
+                       {
+                            littleTrans[t1]+=p3->TxAmount;
+                       }
+                       else
+                       {
+                           if(strcmp(p3->TxKind, "餐饮")==0)
+                           {
+                                food[t1]+=p3->TxAmount;
+                           }
+                           else
+                           {
+                               if(strcmp(p3->TxKind, "门票")==0)
+                               {
+                                    tickets[t1]+=p3->TxAmount;
+                               }
+                               else
+                               {
+                                   if(strcmp(p3->TxKind, "购物")==0)
+                                   {
+                                        shopping[t1]+=p3->TxAmount;
+                                   }
+                                   else
+                                   {
+                                        others[t1]+=p3->TxAmount;
+                                   }
+                               }
+                           }
+                       }
+                   }
                }
-               if(strcmp(p3->TxKind, "小交通")==0)
-               {
-                    littleTrans[t1]+=p3->TxAmount;
-                    break;
-               }
-               if(strcmp(p3->TxKind, "餐饮")==0)
-               {
-                    food[t1]+=p3->TxAmount;
-                    break;
-               }
-               if(strcmp(p3->TxKind, "门票")==0)
-               {
-                    tickets[t1]+=p3->TxAmount;
-                    break;
-               }
-               if(strcmp(p3->TxKind, "购物")==0)
-               {
-                    shopping[t1]+=p3->TxAmount;
-                    break;
-               }
-               if(strcmp(p3->TxKind, "其他")==0)
-               {
-                    others[t1]+=p3->TxAmount;
-                    break;
-               }
-               others[t1]+=p3->TxAmount;
                p3=p3->nextDayEXPInfo;
                t3++;
            }
            p2 = p2->nextDayInfo;
            t2++;
        }
-       tableWidget->setItem(0, t1, new QTableWidgetItem(QString("%1").arg(p1->routeNum)));
-       tableWidget->setItem(1, t1, new QTableWidgetItem(QString("%1").arg(residence[t1])));
-       tableWidget->setItem(2, t1, new QTableWidgetItem(QString("%1").arg(bigTrans[t1])));
-       tableWidget->setItem(3, t1, new QTableWidgetItem(QString("%1").arg(littleTrans[t1])));
-       tableWidget->setItem(4, t1, new QTableWidgetItem(QString("%1").arg(food[t1])));
-       tableWidget->setItem(5, t1, new QTableWidgetItem(QString("%1").arg(tickets[t1])));
-       tableWidget->setItem(6, t1, new QTableWidgetItem(QString("%1").arg(shopping[t1])));
-       tableWidget->setItem(7, t1, new QTableWidgetItem(QString("%1").arg(others[t1])));
-       total=residence[t1]+bigTrans[t1]+littleTrans[t1]+littleTrans[t1]+food[t1]+tickets[t1]+shopping[t1]+others[t1];
-       pp_residence=residence[t1]/total*100;
-       pp_bigTrans=bigTrans[t1]/total*100;
-       pp_litteTrans=littleTrans[t1]/total*100;
-       pp_food=food[t1]/total*100;
-       pp_tickets=tickets[t1]/total*100;
-       pp_shopping=shopping[t1]/total*100;
-       pp_others=others[t1]/total*100;
        p1 = p1->nextRoute;//为什么不显示？
-       series->append("住宿"+QString("%1").arg(pp_residence)+"%",residence[t1]);
-       series->append("大交通"+QString("%1").arg(pp_bigTrans)+"%",bigTrans[t1]);
-       series->append("小交通"+QString("%1").arg(pp_litteTrans)+"%",littleTrans[t1]);
-       series->append("餐饮"+QString("%1").arg(pp_food)+"%",food[t1]);
-       series->append("门票"+QString("%1").arg(pp_tickets)+"%",tickets[t1]);
-       series->append("购物"+QString("%1").arg(pp_shopping)+"%",shopping[t1]);
-       series->append("其他"+QString("%1").arg(pp_others)+"%",others[t1]);
        t1++;
     }
-    t1=1;
+    p1=hRoute;
+    for(int i=1;i<t1;i++)
+    {
+        chart[i]=new QChart();
+        series[i]= new QPieSeries();
+        tableWidget->setItem(0, i, new QTableWidgetItem(QString("%1").arg(p1->routeNum)));
+        tableWidget->setItem(1, i, new QTableWidgetItem(QString("%1").arg(residence[i])));
+        tableWidget->setItem(2, i, new QTableWidgetItem(QString("%1").arg(bigTrans[i])));
+        tableWidget->setItem(3, i, new QTableWidgetItem(QString("%1").arg(littleTrans[i])));
+        tableWidget->setItem(4, i, new QTableWidgetItem(QString("%1").arg(food[i])));
+        tableWidget->setItem(5, i, new QTableWidgetItem(QString("%1").arg(tickets[i])));
+        tableWidget->setItem(6, i, new QTableWidgetItem(QString("%1").arg(shopping[i])));
+        tableWidget->setItem(7, i, new QTableWidgetItem(QString("%1").arg(others[i])));
+        total=residence[i]+bigTrans[i]+littleTrans[i]+food[i]+tickets[i]+shopping[i]+others[i];
+        pp_residence=residence[i]/total*100;
+        pp_bigTrans=bigTrans[i]/total*100;
+        pp_litteTrans=littleTrans[i]/total*100;
+        pp_food=food[i]/total*100;
+        pp_tickets=tickets[i]/total*100;
+        pp_shopping=shopping[i]/total*100;
+        pp_others=others[i]/total*100;
+        series[i]->append("住宿"+QString("%1").arg(pp_residence)+"%",residence[i]);
+        series[i]->append("大交通"+QString("%1").arg(pp_bigTrans)+"%",bigTrans[i]);
+        series[i]->append("小交通"+QString("%1").arg(pp_litteTrans)+"%",littleTrans[i]);
+        series[i]->append("餐饮"+QString("%1").arg(pp_food)+"%",food[i]);
+        series[i]->append("门票"+QString("%1").arg(pp_tickets)+"%",tickets[i]);
+        series[i]->append("购物"+QString("%1").arg(pp_shopping)+"%",shopping[i]);
+        series[i]->append("其他"+QString("%1").arg(pp_others)+"%",others[i]);
+        series[i]->setLabelsVisible();
+        chart[i]->legend()->setAlignment(Qt::AlignRight);  // 设置图例靠右显示
+        chart[i]->addSeries(series[i]);
+        chart[i]->setTitle(QString("%1").arg(p1->routeNum)+"消费信息");
+        chart[i]->legend()->hide();
+        chartview[i]= new QChartView(chart[i]);
+        chartview[i]->setRenderHint(QPainter::Antialiasing);
+        layout->addWidget(chartview[i],0,i);
+         p1=p1->nextRoute;
+    }
 
-
-    //QChart *chartlist[]=new QChart();
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("PieChart Example");
-    chart->legend()->hide();
-
-    QChartView *chartview = new QChartView(chart);
-    chartview->setRenderHint(QPainter::Antialiasing);
-
-
-
-    showDialog = new QDialog;
-    showDialog->setWindowTitle("行程信息");
-    QGroupBox *box = new QGroupBox(this);
-    QGridLayout *layout = new QGridLayout;
-    box->setLayout(layout);
-    layout->addWidget(tableWidget);
-    layout->addWidget(chartview);
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(box);
     showDialog->setLayout(mainLayout);
