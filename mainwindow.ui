@@ -59,7 +59,7 @@
      <x>0</x>
      <y>0</y>
      <width>974</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_F">
@@ -105,6 +105,7 @@
     <addaction name="modifyRouteAction"/>
     <addaction name="modifyDayInfoAction"/>
     <addaction name="modifyDayEXPInfoAction"/>
+    <addaction name="sortRouteAction"/>
    </widget>
    <widget class="QMenu" name="menu_S">
     <property name="title">
@@ -226,6 +227,11 @@
   <action name="showDressingIndexAction">
    <property name="text">
     <string>查询穿衣指数</string>
+   </property>
+  </action>
+  <action name="sortRouteAction">
+   <property name="text">
+    <string>行程排序</string>
    </property>
   </action>
  </widget>

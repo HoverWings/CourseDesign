@@ -945,33 +945,35 @@ float findEXPByResidence(char Residence[50])
     return residenceEXP;
 }
 
-/*
-bool sortByRouteNum(p_Route * head,p_Route *end)//quick sort
+
+bool sortByRouteNum()//quick sort
 {
-    if(hRoute==NULL)
+    p_Route p1=hRoute;
+    p_Route pre_p1=hRoute;
+    if(p1==NULL)
     {
         return false;
     }
-    p_Route p1=hRoute->nextRoute;
-    p_Route* small;
-    (*small)=p_Route;
-    while( p1 != NULL)
+    while(p1->nextRoute != NULL)
     {
-        if( p1 -> routeNum < p_Route -> routeNum)
+        p_Route p;
+        p_Route pt=p1->nextRoute;
+        if((p1->routeNum)>(pt->routeNum))
         {
-            small = small -> nextRoute;//对于小于轴的元素放在左边
-            t = small -> data;
-            small -> data = p -> data;
-            p -> data = t;
+            p_Route p2=p1->nextRoute;
+            p_Route p3=p1->nextRoute;
+            pre_p1->nextRoute=p2;
+            p2->nextRoute=p1;
+            p1->nextRoute=p3;
+            pre_p1=p2;
         }
-        p = p -> next;
+        p1=p1->nextRoute;  //p再前进一个节点
+        pre_p1=pre_p1->nextRoute;
     }
-
-    sortByRouteNum(head,small);
-    sortByRouteNum(small->nextRoute,small);
+    return true;
 }
 
-
+/*
 void quicksort(Linklist head, Linklist end)
 {
     if(head == NULL || head == end)             //如果头指针为空或者链表为空，直接返回
@@ -1004,6 +1006,67 @@ bool sortByOrder(p_DayInfo *p2);
 bool sortBySerialNum();
 
 */
+
+void ListBubbleSort(p_Route * pHead)//由于没有头结点，所以链表的头结点可能被更改
+{
+    int n = GetLength(*pHead);
+    p_Route  p1, p2, pPrev;
+    for (int i = 0; i < n - 1; i++)//外层循环，控制冒泡排序进行几轮
+    {
+        p1 = *pHead;
+        p2 = (*pHead)->nextRoute;
+        pPrev = NULL;
+
+        for (int j = 0; j < n - 1 - i; j++)//内层循环，控制从第一个节点开始进行遍历
+        {
+            if (p1->routeNum > p2->routeNum)
+            {
+                if (pPrev == NULL)//若需要交换的节点包括头结点
+                {
+                    p_Route  pTemp = p2->nextRoute;
+                    p1->nextRoute = pTemp;
+                    p2->nextRoute = p1;
+                    *pHead = p2;
+                    pPrev = p2;
+                    p2 = pTemp;
+                    continue;
+
+                }
+                else//若交换的节点不包括头结点
+                {
+                    p_Route  pTemp = p2->nextRoute;
+                    pPrev->nextRoute = p2;
+                    p2->nextRoute = p1;
+                    p1->nextRoute = pTemp;
+                    pPrev = p2;
+                    p2 = pTemp;
+                    continue;
+                }
+            }
+            if(p1!=NULL&&p2!=NULL&&pPrev!=NULL)
+            {
+                if(p1->nextRoute!=NULL&&p2->nextRoute!=NULL&&pPrev->nextRoute!=NULL)
+                {
+                    p1 = p1->nextRoute;
+                    p2 = p2->nextRoute;
+                    pPrev = pPrev->nextRoute;
+                }
+            }
+        }
+        //PrintList(*pHead);
+    }
+}
+
+int GetLength(p_Route pHead)
+{
+    int Length = 0;
+    while (pHead != NULL)
+    {
+        ++Length;
+        pHead = pHead->nextRoute;
+    }
+    return Length;
+}
 
 
 

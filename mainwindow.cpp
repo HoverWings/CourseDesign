@@ -48,6 +48,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->countEXPAction,SIGNAL(triggered()),this,SLOT(countEXPSlot()));
     QObject::connect(ui->showTransInfoAction,SIGNAL(triggered()),this,SLOT(showTransInfoSlot()));
     QObject::connect(ui->showResidenceAction,SIGNAL(triggered()),this,SLOT(showResidenceSlot()));
+    QObject::connect(ui->showDressingIndexAction,SIGNAL(triggered()),this,SLOT(showDressingIndexSlot()));
+    QObject::connect(ui->sortRouteAction,SIGNAL(triggered()),this,SLOT(sortRouteSlot()));
+
+
 
 
 
@@ -1317,6 +1321,102 @@ void MainWindow::Act_showResidenceSlot()
         return;
     }
 }
+
+void MainWindow::showDressingIndexSlot()
+{
+    deletedialog = new QDialog;
+    deletedialog->setWindowTitle("穿衣指数");
+    QGroupBox *box = new QGroupBox(this);
+    QPushButton *submitBtn = new QPushButton("确认");
+    QPushButton *cancelBtn = new QPushButton("取消");
+    connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_showDressingIndexSlot()));
+    connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtSlot()));
+
+    QLabel *time1 = new QLabel("时间1");
+    QLabel *time2 = new QLabel("时间2");
+    routeNumLineEdit = new QLineEdit;
+    orderLineEdit= new QLineEdit;
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(time1, 0, 0, 1, 1);
+    layout->addWidget(routeNumLineEdit, 0, 1, 1, 1);
+    layout->addWidget(time2, 1, 0, 1, 1);
+    layout->addWidget(orderLineEdit, 1, 1, 1, 1);
+
+
+    layout->addWidget(submitBtn, 2, 0, 1, 1);
+    layout->addWidget(cancelBtn, 2, 1, 1, 1);
+    box->setLayout(layout);
+    QGridLayout *mainLayout = new QGridLayout;
+    mainLayout->addWidget(box);
+    deletedialog->setLayout(mainLayout);
+    deletedialog->show();
+}
+
+void MainWindow::Act_showDressingIndexSlot()
+{
+    QMessageBox msgBox;
+    QDateTime dateTime1 = QDateTime::fromString(routeNumLineEdit->text(), "yyyy-MM-dd");
+    QDateTime dateTime2 = QDateTime::fromString(orderLineEdit->text(), "yyyy-MM-dd");
+    QDateTime t_time1;
+    QDateTime t_time2;
+    deletedialog->close();
+    p_Route p1 = hRoute;
+    if (p1 == NULL)
+    {
+
+        msgBox.setText("无符合要求的行程信息");
+        msgBox.exec();
+        return;
+    }
+    QString str1;
+    QString str2;
+    QString printStr;
+    p_Route A_p1[10]= {NULL};
+    int i=1;
+    while (p1 != NULL)
+    {
+        str1=QString::fromUtf8(p1->beginDate);
+        str2=QString::fromUtf8(p1->arriveDate);
+        if(str1.isEmpty()||str2.isEmpty())
+        {
+             p1 = p1->nextRoute;
+        }
+        t_time1=QDateTime::fromString(str1, "yyyy-MM-dd");
+        t_time2=QDateTime::fromString(str2, "yyyy-MM-dd");
+        if(dateTime1<=t_time1&&t_time2<=dateTime2&&t_time1<=t_time2)
+        {
+            //入p3
+            A_p1[i++]=p1;
+        }
+
+        p1 = p1->nextRoute;
+    }
+    i=1;
+    if(A_p1[1]==NULL)
+    {
+        msgBox.setText("无符合要求的行程信息");
+        msgBox.exec();
+        return;
+    }
+    while(A_p1[i]!=NULL)
+    {
+        QString qq=QString::fromUtf8(A_p1[i]->dressingIndex.recommendedDressing);
+        QString tStr="行程："+QString("%1").arg(A_p1[i]->routeNum)+"\t"+QString::fromUtf8(A_p1[i]->dressingIndex.recommendedDressing)+"\n";
+        printStr+=tStr;
+        i++;
+    }
+    msgBox.setText(printStr);
+    msgBox.exec();
+    return;
+}
+
+
+void MainWindow::sortRouteSlot()
+{
+    //sortByRouteNum();
+    ListBubbleSort(&hRoute);
+}
+
 
 
 

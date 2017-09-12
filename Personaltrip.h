@@ -129,6 +129,9 @@ bool sortByRouteNum();
 bool sortByOrder();
 bool sortBySerialNum();
 
+void ListBubbleSort(p_Route * pHead);
+int GetLength(p_Route pHead);
+
 p_DayInfo findTransInfoByScene(char Scene[50]);
 float findEXPByResidence(char Residence[50]);
 

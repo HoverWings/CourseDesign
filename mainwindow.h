@@ -14,6 +14,7 @@
 #include<QPushButton>
 #include<QDebug>
 #include<string>
+#include<QDateTime>
 #include"newRoute.h"
 #include"newDayInfo.h"
 #include"newDayEXPInfo.h"
@@ -82,12 +83,18 @@ private slots:
     void showResidenceSlot();
     void Act_showResidenceSlot();
 
+    void showDressingIndexSlot();
+    void Act_showDressingIndexSlot();
+
+    void sortRouteSlot();
+
 
 
 
 
 
     void on_modifyButton_clicked();
+
 
 private:
     Ui::MainWindow *ui;
