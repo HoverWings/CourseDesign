@@ -973,91 +973,35 @@ bool sortByRouteNum()//quick sort
     return true;
 }
 
-/*
-void quicksort(Linklist head, Linklist end)
+
+void sortRouteByNum(p_Route * pHead)//由于没有头结点，所以链表的头结点可能被更改
 {
-    if(head == NULL || head == end)             //如果头指针为空或者链表为空，直接返回
-        return ;
-    int t;
-    Linklist p = head -> next;                  //用来遍历的指针
-    Linklist small = head;
-    while( p != end){
-        if( p -> data < head -> data){      //对于小于轴的元素放在左边
-            small = small -> next;
-            t = small -> data;
-            small -> data = p -> data;
-            p -> data = t;
-        }
-        p = p -> next;
-    }
-    t = head -> data;                           //遍历完后，对左轴元素与small指向的元素交换
-    head -> data = small -> data;
-    small -> data = t;
-    quicksort(head, small);                     //对左右进行递归
-    quicksort(small -> next, end);
-}
-
-bool swapRoute(p_Route *p1,p_Route * p2)
-{
-
-}
-
-bool sortByOrder(p_DayInfo *p2);
-bool sortBySerialNum();
-
-*/
-
-void ListBubbleSort(p_Route * pHead)//由于没有头结点，所以链表的头结点可能被更改
-{
-    int n = GetLength(*pHead);
-    p_Route  p1, p2, pPrev;
-    for (int i = 0; i < n - 1; i++)//外层循环，控制冒泡排序进行几轮
+    if((* pHead)==NULL)
     {
-        p1 = *pHead;
-        p2 = (*pHead)->nextRoute;
-        pPrev = NULL;
-
-        for (int j = 0; j < n - 1 - i; j++)//内层循环，控制从第一个节点开始进行遍历
+        return;
+    }
+    int length = GetRouteLength(*pHead);
+    p_Route  pMove=(*pHead);
+    for (int i = 0; i < length; i++) //需要进行(n-1)次遍历,控制次数
+    {
+        if(pMove!=NULL)
         {
-            if (p1->routeNum > p2->routeNum)
+            while (pMove!=NULL&&pMove->nextRoute != NULL)
             {
-                if (pPrev == NULL)//若需要交换的节点包括头结点
+                if (pMove->routeNum > pMove->nextRoute->routeNum)
                 {
-                    p_Route  pTemp = p2->nextRoute;
-                    p1->nextRoute = pTemp;
-                    p2->nextRoute = p1;
-                    *pHead = p2;
-                    pPrev = p2;
-                    p2 = pTemp;
-                    continue;
-
+                    sawpRoutePf(pMove, pMove->nextRoute,pHead);
+                    printRoute();
                 }
-                else//若交换的节点不包括头结点
-                {
-                    p_Route  pTemp = p2->nextRoute;
-                    pPrev->nextRoute = p2;
-                    p2->nextRoute = p1;
-                    p1->nextRoute = pTemp;
-                    pPrev = p2;
-                    p2 = pTemp;
-                    continue;
-                }
-            }
-            if(p1!=NULL&&p2!=NULL&&pPrev!=NULL)
-            {
-                if(p1->nextRoute!=NULL&&p2->nextRoute!=NULL&&pPrev->nextRoute!=NULL)
-                {
-                    p1 = p1->nextRoute;
-                    p2 = p2->nextRoute;
-                    pPrev = pPrev->nextRoute;
-                }
+                pMove = pMove->nextRoute;
             }
         }
-        //PrintList(*pHead);
+        //每次遍历结束，pMove重新移动到链表头部
+        pMove=(*pHead);
     }
 }
 
-int GetLength(p_Route pHead)
+int GetRouteLength(p_Route pHead)
 {
     int Length = 0;
     while (pHead != NULL)
@@ -1068,9 +1012,266 @@ int GetLength(p_Route pHead)
     return Length;
 }
 
+void sawpRoutePf(p_Route A, p_Route B,p_Route* head)
+{
+    p_Route t_head=(*head);
+    p_Route temp;
+    p_Route pre_A;
+    p_Route pre_B;
+    if(A->routeNum==(*head)->routeNum)
+    {
+        if(A->nextRoute==B)
+        {
+             (*head)=B;//B的前指针
+             A->nextRoute=B->nextRoute;
+             B->nextRoute=A;
+             return;
+        }
+        while (t_head != NULL)
+        {
+            if (t_head->nextRoute == A)
+            {
+                pre_A = t_head;
+            }
+            if (t_head->nextRoute == B)
+            {
+                pre_B = t_head;
+            }
+            t_head = t_head->nextRoute;
+        }
+        temp = B->nextRoute;
+        (*head)=B;//B的前指针
+        B->nextRoute=A->nextRoute;//B的后指针
+        pre_B->nextRoute=A;//A的前指针
+        A->nextRoute = temp;
+    }
+
+    while (t_head != NULL)
+    {
+        if (t_head->nextRoute == A)
+        {
+            pre_A = t_head;
+        }
+        if (t_head->nextRoute == B)
+        {
+            pre_B = t_head;
+        }
+        t_head = t_head->nextRoute;
+    }
+    if(A->nextRoute==B)
+    {
+         pre_A->nextRoute = B;//B的前节点
+         A->nextRoute=B->nextRoute;
+         B->nextRoute=A;
+         return;
+    }
+    temp = B->nextRoute;
+    pre_A->nextRoute = B;//B的前节点
+    B->nextRoute = A->nextRoute;//B的后节点
+    pre_B->nextRoute = A;//A的前节点
+    A->nextRoute = temp;//A的前节点
+}
 
 
 
+void sortDayInfoByOrder(p_DayInfo * pHead)//由于没有头结点，所以链表的头结点可能被更改
+{
+    if((* pHead)==NULL)
+    {
+        return;
+    }
+    int length = GetDayInfoLength(*pHead);
+    p_DayInfo  pMove=(*pHead);
+    for (int i = 0; i < length; i++) //需要进行(n-1)次遍历,控制次数
+    {
+        if(pMove!=NULL)
+        {
+            while (pMove!=NULL&&pMove->nextDayInfo != NULL)
+            {
+                if (pMove->order > pMove->nextDayInfo->order)
+                {
+                    sawpDayInfoPf(pMove, pMove->nextDayInfo,pHead);
+                    printRoute();
+                }
+                pMove = pMove->nextDayInfo;
+            }
+        }
+        //每次遍历结束，pMove重新移动到链表头部
+        pMove=(*pHead);
+    }
+}
+
+int GetDayInfoLength(p_DayInfo pHead)
+{
+    int Length = 0;
+    while (pHead != NULL)
+    {
+        ++Length;
+        pHead = pHead->nextDayInfo;
+    }
+    return Length;
+}
+
+void sawpDayInfoPf(p_DayInfo A, p_DayInfo B,p_DayInfo* head)
+{
+    p_DayInfo t_head=(*head);
+    p_DayInfo temp;
+    p_DayInfo pre_A;
+    p_DayInfo pre_B;
+    if(A->order==(*head)->order)
+    {
+        if(A->nextDayInfo==B)
+        {
+             (*head)=B;//B的前指针
+             A->nextDayInfo=B->nextDayInfo;
+             B->nextDayInfo=A;
+             return;
+        }
+        while (t_head != NULL)
+        {
+            if (t_head->nextDayInfo == A)
+            {
+                pre_A = t_head;
+            }
+            if (t_head->nextDayInfo == B)
+            {
+                pre_B = t_head;
+            }
+            t_head = t_head->nextDayInfo;
+        }
+        temp = B->nextDayInfo;
+        (*head)=B;//B的前指针
+        B->nextDayInfo=A->nextDayInfo;//B的后指针
+        pre_B->nextDayInfo=A;//A的前指针
+        A->nextDayInfo = temp;
+    }
+
+    while (t_head != NULL)
+    {
+        if (t_head->nextDayInfo == A)
+        {
+            pre_A = t_head;
+        }
+        if (t_head->nextDayInfo == B)
+        {
+            pre_B = t_head;
+        }
+        t_head = t_head->nextDayInfo;
+    }
+    if(A->nextDayInfo==B)
+    {
+         pre_A->nextDayInfo = B;//B的前节点
+         A->nextDayInfo=B->nextDayInfo;
+         B->nextDayInfo=A;
+         return;
+    }
+    temp = B->nextDayInfo;
+    pre_A->nextDayInfo = B;//B的前节点
+    B->nextDayInfo = A->nextDayInfo;//B的后节点
+    pre_B->nextDayInfo = A;//A的前节点
+    A->nextDayInfo = temp;//A的前节点
+    printf("\n");
+}
+
+
+void sortDayEXPInfoBySerial(p_DayEXPInfo * pHead)//由于没有头结点，所以链表的头结点可能被更改
+{
+    if((* pHead)==NULL)
+    {
+        return;
+    }
+    int length = GetDayEXPInfoLength(*pHead);
+    p_DayEXPInfo  pMove=(*pHead);
+    for (int i = 0; i < length; i++) //需要进行(n-1)次遍历,控制次数
+    {
+        if(pMove!=NULL)
+        {
+            while (pMove!=NULL&&pMove->nextDayEXPInfo != NULL)
+            {
+                if (pMove->serialNum > pMove->nextDayEXPInfo->serialNum)
+                {
+                    sawpDayEXPInfoPf(pMove, pMove->nextDayEXPInfo,pHead);
+                    printRoute();
+                }
+                pMove = pMove->nextDayEXPInfo;
+            }
+        }
+        //每次遍历结束，pMove重新移动到链表头部
+        pMove=(*pHead);
+    }
+}
+
+int GetDayEXPInfoLength(p_DayEXPInfo pHead)
+{
+    int Length = 0;
+    while (pHead != NULL)
+    {
+        ++Length;
+        pHead = pHead->nextDayEXPInfo;
+    }
+    return Length;
+}
+
+void sawpDayEXPInfoPf(p_DayEXPInfo A, p_DayEXPInfo B,p_DayEXPInfo* head)
+{
+    p_DayEXPInfo t_head=(*head);
+    p_DayEXPInfo temp;
+    p_DayEXPInfo pre_A;
+    p_DayEXPInfo pre_B;
+    if(A->serialNum==(*head)->serialNum)
+    {
+        if(A->nextDayEXPInfo==B)
+        {
+             (*head)=B;//B的前指针
+             A->nextDayEXPInfo=B->nextDayEXPInfo;
+             B->nextDayEXPInfo=A;
+             return;
+        }
+        while (t_head != NULL)
+        {
+            if (t_head->nextDayEXPInfo == A)
+            {
+                pre_A = t_head;
+            }
+            if (t_head->nextDayEXPInfo == B)
+            {
+                pre_B = t_head;
+            }
+            t_head = t_head->nextDayEXPInfo;
+        }
+        temp = B->nextDayEXPInfo;
+        (*head)=B;//B的前指针
+        B->nextDayEXPInfo=A->nextDayEXPInfo;//B的后指针
+        pre_B->nextDayEXPInfo=A;//A的前指针
+        A->nextDayEXPInfo = temp;
+    }
+
+    while (t_head != NULL)
+    {
+        if (t_head->nextDayEXPInfo == A)
+        {
+            pre_A = t_head;
+        }
+        if (t_head->nextDayEXPInfo == B)
+        {
+            pre_B = t_head;
+        }
+        t_head = t_head->nextDayEXPInfo;
+    }
+    if(A->nextDayEXPInfo==B)
+    {
+         pre_A->nextDayEXPInfo = B;//B的前节点
+         A->nextDayEXPInfo=B->nextDayEXPInfo;
+         B->nextDayEXPInfo=A;
+         return;
+    }
+    temp = B->nextDayEXPInfo;
+    pre_A->nextDayEXPInfo = B;//B的前节点
+    B->nextDayEXPInfo = A->nextDayEXPInfo;//B的后节点
+    pre_B->nextDayEXPInfo = A;//A的前节点
+    A->nextDayEXPInfo = temp;//A的前节点
+    printf("\n");
+}
 
 
 

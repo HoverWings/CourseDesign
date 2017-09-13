@@ -58,7 +58,7 @@ typedef struct DayInfo //行程具体信息结构体
     char afternoonScene[50];//下午景点
     char dinnerLoc[50];//晚餐地点
     //struct DayTransInfo* headDayTransInfo;//站点链表
-    char transInfo[50];//小交通
+    char transInfo[200];//小交通
     char residence[50];//住宿地点
     struct DayEXPInfo* hDayEXPInfo;
     struct DayInfo* nextDayInfo;//链表next指针
@@ -77,11 +77,11 @@ typedef struct DayEXPInfo //每天消费信息
     //char routeNum[10];//所属行程编号
     int order;//序号 2代表第二天
     int serialNum;//顺序号
-    char TxTime[8];//交易时间
+    char TxTime[20];//交易时间
     char TxKind[16];//交易种类
     float TxAmount;//交易金额
-    char isPrepayment[4];//是否预支付
-    char payment[4];//支付方式
+    char isPrepayment[10];//是否预支付
+    char payment[10];//支付方式
     char explain[50];//说明
     struct DayEXPInfo* nextDayEXPInfo;
     //此处可否使用bool
@@ -125,12 +125,19 @@ bool loadFromFile();
 
 bool printAll();
 
-bool sortByRouteNum();
-bool sortByOrder();
-bool sortBySerialNum();
 
-void ListBubbleSort(p_Route * pHead);
-int GetLength(p_Route pHead);
+
+void sortRouteByNum(p_Route * pHead);//由于没有头结点，所以链表的头结点可能被更改
+void sawpRoutePf(p_Route A, p_Route B,p_Route* head);
+int GetRouteLength(p_Route pHead);
+
+void sortDayInfoByOrder(p_DayInfo * pHead);//由于没有头结点，所以链表的头结点可能被更改
+void sawpDayInfoPf(p_DayInfo A, p_DayInfo B,p_DayInfo* head);
+int GetDayInfoLength(p_DayInfo pHead);
+
+void sortDayEXPInfoBySerial(p_DayEXPInfo * pHead);//由于没有头结点，所以链表的头结点可能被更改
+void sawpDayEXPInfoPf(p_DayEXPInfo A, p_DayEXPInfo B,p_DayEXPInfo* head);
+int GetDayEXPInfoLength(p_DayEXPInfo pHead);
 
 p_DayInfo findTransInfoByScene(char Scene[50]);
 float findEXPByResidence(char Residence[50]);

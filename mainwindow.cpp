@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->showResidenceAction,SIGNAL(triggered()),this,SLOT(showResidenceSlot()));
     QObject::connect(ui->showDressingIndexAction,SIGNAL(triggered()),this,SLOT(showDressingIndexSlot()));
     QObject::connect(ui->sortRouteAction,SIGNAL(triggered()),this,SLOT(sortRouteSlot()));
+    QObject::connect(ui->sortDayInfoAction,SIGNAL(triggered()),this,SLOT(sortDayInfoSlot()));
+    QObject::connect(ui->sortDayEXPInfoAction,SIGNAL(triggered()),this,SLOT(sortDayEXPInfoSlot()));
+
 
 
 
@@ -1044,8 +1047,8 @@ void MainWindow::countEXPSlot()
 {
     showTree();
     QTableWidget *  tableWidget = new QTableWidget(this);
-    tableWidget->setRowCount(10);
-    tableWidget->setColumnCount(5);
+    tableWidget->setRowCount(15);
+    tableWidget->setColumnCount(10);
     tableWidget->setHorizontalHeaderLabels(QStringList() << "费用类型" <<"费用金额");
     tableWidget->verticalHeader()->setVisible(false);//hide vertical header
     tableWidget->setColumnWidth(0,200);
@@ -1104,10 +1107,10 @@ void MainWindow::countEXPSlot()
     {
 
        //MessageBox msgBox;
-       //msgBox.setText("当前无信息 输出错误");
+      // msgBox.setText("当前无信息 输出错误");
        //msgBox.exec();
 
-       //return;
+       return;
     }
     while (p1 != NULL)
     {
@@ -1172,8 +1175,10 @@ void MainWindow::countEXPSlot()
        p1 = p1->nextRoute;//为什么不显示？
        t1++;
     }
+
     p1=hRoute;
     int index_mostTickets=1;
+
     for(int i=1;i<t1;i++)
     {
 
@@ -1212,15 +1217,42 @@ void MainWindow::countEXPSlot()
         chartview[i]->setRenderHint(QPainter::Antialiasing);
         layout->addWidget(chartview[i],0,i);
         p1->totalPrice=total;
-        if(tickets[i]>index_mostTickets)
+        if(tickets[i]>tickets[index_mostTickets])
         {
             index_mostTickets=i;
         }
         p1=p1->nextRoute;
     }
+    p1=hRoute;
+    int index_mostAvg=1;
+    int index_leastAvg=1;
+    float avg[10];
+    for(int i=1;i<t1;i++)
+    {
+        if(p1->totalTime!=0)
+        {
+               avg[i]=p1->totalPrice/p1->totalTime;
+               if(avg[i]>avg[index_mostAvg])
+               {
+                    index_mostAvg=i;
+               }
+               if(avg[i]<avg[index_leastAvg])
+               {
+                    index_leastAvg=i;
+               }
+        }
+        p1=p1->nextRoute;
+    }
+
     tableWidget->setItem(9, 0, new QTableWidgetItem("门票价格最高的是"));
     tableWidget->setItem(9, 1, new QTableWidgetItem(tableWidget->item(0,index_mostTickets)->text()));
     tableWidget->setItem(9, 2, new QTableWidgetItem(QString("%1").arg(tickets[index_mostTickets])+"元"));
+    tableWidget->setItem(10, 0, new QTableWidgetItem("日消费价格最高的是"));
+    tableWidget->setItem(10, 1, new QTableWidgetItem(tableWidget->item(0,index_mostAvg)->text()));
+    tableWidget->setItem(10, 2, new QTableWidgetItem(QString("%1").arg(avg[index_mostAvg])+"元"));
+    tableWidget->setItem(10, 0, new QTableWidgetItem("日消费价格最低的是"));
+    tableWidget->setItem(10, 1, new QTableWidgetItem(tableWidget->item(0,index_leastAvg)->text()));
+    tableWidget->setItem(10, 2, new QTableWidgetItem(QString("%1").arg(avg[index_leastAvg])+"元"));
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->addWidget(box);
     showDialog->setLayout(mainLayout);
@@ -1414,9 +1446,49 @@ void MainWindow::Act_showDressingIndexSlot()
 void MainWindow::sortRouteSlot()
 {
     //sortByRouteNum();
-    ListBubbleSort(&hRoute);
+    //ListBubbleSort(&hRoute);
+    sortRouteByNum(&hRoute);
+    showTree();
 }
 
+void MainWindow::sortDayInfoSlot()
+{
+    p_Route p1=hRoute;
+    if(p1==NULL)
+    {
+        return ;
+    }
+    while(p1!=NULL)
+    {
+        p_DayInfo p2=p1->hDayInfo;
+        sortDayInfoByOrder(&p2);
+        p1->hDayInfo=p2;
+        p1=p1->nextRoute;
+    }
+    showTree();
+}
+
+void MainWindow::sortDayEXPInfoSlot()
+{
+    p_Route p1=hRoute;
+    if(p1==NULL)
+    {
+        return ;
+    }
+    while(p1!=NULL)
+    {
+        p_DayInfo p2=p1->hDayInfo;
+        if(p2!=NULL)
+        {
+            p_DayEXPInfo p3=p2->hDayEXPInfo;
+            sortDayEXPInfoBySerial(&p3);
+            p2->hDayEXPInfo=p3;
+            p2=p2->nextDayInfo;
+        }
+        p1=p1->nextRoute;
+    }
+    showTree();
+}
 
 
 

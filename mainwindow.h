@@ -87,6 +87,8 @@ private slots:
     void Act_showDressingIndexSlot();
 
     void sortRouteSlot();
+    void sortDayInfoSlot();
+    void sortDayEXPInfoSlot();
 
 
 
