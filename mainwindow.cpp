@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->deleteDayInfoAction, SIGNAL(triggered()), this, SLOT(deleteDayInfoSlot()));
     QObject::connect(ui->deleteDayEXPInfoAction, SIGNAL(triggered()), this, SLOT(deleteDayEXPInfoSlot()));
 
-    //
     QObject::connect(ui->showRouteAction, SIGNAL(triggered()), this, SLOT(showRouteslot()));
     QObject::connect(ui->showDayInfoAction, SIGNAL(triggered()), this, SLOT(showDayInfoslot()));
     QObject::connect(ui->showDayEXPInfoAction, SIGNAL(triggered()), this, SLOT(showDayEXPInfoslot()));
@@ -52,14 +51,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->sortRouteAction,SIGNAL(triggered()),this,SLOT(sortRouteSlot()));
     QObject::connect(ui->sortDayInfoAction,SIGNAL(triggered()),this,SLOT(sortDayInfoSlot()));
     QObject::connect(ui->sortDayEXPInfoAction,SIGNAL(triggered()),this,SLOT(sortDayEXPInfoSlot()));
-
-
-
-
-
-
-
-
 }
 
 
@@ -86,7 +77,6 @@ void MainWindow::Show_info(QTreeWidgetItem* item,int n){//show details
        return;
     }
     //route
-
     if(now_index[0] != -1 && now_index[1] == -1 && now_index[2] == -1)
     {
         p_Route p1=hRoute;
@@ -129,8 +119,6 @@ void MainWindow::Show_info(QTreeWidgetItem* item,int n){//show details
         ui->tableWidget->setItem(11, 1, new QTableWidgetItem(QString("%1").arg(p1->totalTime)));
         ui->tableWidget->setItem(12, 1, new QTableWidgetItem(QString("%1").arg(p1->totalNum)));
         ui->tableWidget->setItem(13, 1, new QTableWidgetItem(QString("%1").arg(p1->totalPrice)));
-
-
     }
 
     //DayInfo
@@ -310,11 +298,6 @@ void MainWindow::showAllslot()
 }
 
 
-
-
-
-
-
 void MainWindow::deleteRouteSlot()
 {
 	deletedialog = new QDialog;
@@ -345,7 +328,6 @@ void MainWindow::Act_deleteRouteSlot()
 {
     int n1 = routeNumLineEdit->text().toInt();
 	QMessageBox msgBox;
-	clearSlot();
 	deletedialog->close();
     if (deleteRoute(n1))
 	{
@@ -372,7 +354,6 @@ void MainWindow::deleteDayInfoSlot()
 	QPushButton *cancelBtn = new QPushButton("取消");
 	connect(submitBtn, SIGNAL(clicked(bool)), this, SLOT(Act_deleteDayInfoSlot()));
 	connect(cancelBtn, SIGNAL(clicked(bool)), this, SLOT(cancelBtnSlot()));
-
 	QLabel *routNum = new QLabel("行程编号");
 	routeNumLineEdit = new QLineEdit;
 	QLabel *order = new QLabel("序号");
@@ -397,7 +378,6 @@ void MainWindow::Act_deleteDayInfoSlot()
 	QMessageBox msgBox;
 	int n1 = routeNumLineEdit->text().toInt();
 	int n2 = orderLineEdit->text().toInt();
-	clearSlot();
 	deletedialog->close();
 	if (deleteDayInfo(n1, n2))
 	{
@@ -453,7 +433,6 @@ void MainWindow::Act_deleteDayEXPInfoSlot()
 	int n1 = routeNumLineEdit->text().toInt();
 	int n2 = orderLineEdit->text().toInt();
 	int n3 = serialNumLineEdit->text().toInt();
-	clearSlot();
 	deletedialog->close();
 	if (deleteDayEXPInfo(n1, n2, n3))
     {showTree();
@@ -468,14 +447,6 @@ void MainWindow::Act_deleteDayEXPInfoSlot()
 		msgBox.exec();
 		return;
 	}
-}
-
-
-void MainWindow::clearSlot()
-{
-	//routeNumLineEdit->clear();//不同槽之间需要调用
-	//orderLineEdit->clear();//不同槽之间需要调用
-	//serialNumLineEdit->clear();//不同槽之间需要调用
 }
 
 void MainWindow::quitBtnSLot()
@@ -499,7 +470,6 @@ void MainWindow::showRouteslot()
 	QGridLayout *layout = new QGridLayout;
 	layout->addWidget(routNum, 0, 0, 1, 1); //从哪里开始 跨度
 	layout->addWidget(routeNumLineEdit, 0, 1, 1, 1); //从哪里开始 跨度
-
 	layout->addWidget(submitBtn, 1, 0, 1, 1);
 	layout->addWidget(cancelBtn, 1, 1, 1, 1);
 	box->setLayout(layout);
@@ -511,21 +481,18 @@ void MainWindow::showRouteslot()
 
 void MainWindow::Act_showRouteslot()
 {
-	//clearSlot();
-	//deletedialog->close();
+
     int n1 = routeNumLineEdit->text().toInt();
 	//查询信息并显示
 	QMessageBox msgBox;
     p_Route p1 = findRouteByNum(n1);
 	if (p1 == NULL)
 	{
-		//clearSlot();
 		deletedialog->close();
 		msgBox.setText("NOT FOUND");
 		msgBox.exec();
 		return;
 	}
-	//clearSlot();  //此处有问题
 	deletedialog->close();
 
 	showDialog = new QDialog;
@@ -653,17 +620,14 @@ void MainWindow::Act_showDayInfoSlot()
     QMessageBox msgBox;
     int n1 = routeNumLineEdit->text().toInt();
     int n2 = orderLineEdit->text().toInt();
-    clearSlot();
     p_DayInfo p2=findDayInfoByOrder(n1,n2);
     if (p2 == NULL)
     {
-        //clearSlot();
         deletedialog->close();
         msgBox.setText("NOT FOUND");
         msgBox.exec();
         return;
     }
-    //clearSlot();  //此处有问题
     deletedialog->close();
 
     showDialog = new QDialog;
@@ -773,7 +737,6 @@ void MainWindow::Act_showDayEXPInfoSlot()
     int n1 = routeNumLineEdit->text().toInt();
     int n2 = orderLineEdit->text().toInt();
     int n3 = serialNumLineEdit->text().toInt();
-    clearSlot();
     deletedialog->close();
     p_DayEXPInfo p3=findDayEXPInfoByserialNum(n1,n2,n3);
     if (p3==NULL)
@@ -783,7 +746,7 @@ void MainWindow::Act_showDayEXPInfoSlot()
         return;
     }
 
-    //clearSlot();  //此处有问题
+    // ();  //此处有问题
     deletedialog->close();
 
     showDialog = new QDialog;
@@ -853,7 +816,6 @@ void MainWindow::Act_showDayEXPInfoSlot()
     showDialog->show();
 }
 
-//还需要错误判断
 void MainWindow::saveToFileSlot()
 {
     QMessageBox msgBox;
@@ -926,20 +888,6 @@ void MainWindow::showTree()
 }
 
 
-void MainWindow::modifyRouteSlot()
-{
-    //qDebug() << ui->tableWidget->item(0,1)->text();
-}
-
-void MainWindow::modifyDayInfoSlot()
-{
-
-}
-
-void MainWindow::modifyDayEXPInfoSlot()
-{
-
-}
 
 
 void MainWindow::on_modifyButton_clicked()

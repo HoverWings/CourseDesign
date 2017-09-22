@@ -17,7 +17,6 @@ newDayEXPInfo::~newDayEXPInfo()
 
 void newDayEXPInfo::on_saveDayEXPInfoButton_clicked()
 {
-    //p_Route cur = (p_Route)malloc(sizeof(Route));
     //字符串赋值
     p_DayEXPInfo cur= (p_DayEXPInfo)malloc(sizeof(DayEXPInfo));
     cur->routeNum=ui->lineEdit->text().toInt();//int
@@ -26,17 +25,10 @@ void newDayEXPInfo::on_saveDayEXPInfoButton_clicked()
     cur->serialNum=ui->lineEdit_3->text().toInt();//int
     strcpy(cur->TxTime, ui->lineEdit_4->text().toStdString().c_str());
     strcpy(cur->TxKind, ui->lineEdit_5->text().toStdString().c_str());
-    //strcpy(cur->TxAmount, ui->lineEdit_6->text().toStdString().c_str());//float
     cur->TxAmount=ui->lineEdit_6->text().toFloat();//float
     strcpy(cur->isPrepayment, ui->lineEdit_7->text().toStdString().c_str());
     strcpy(cur->payment, ui->lineEdit_8->text().toStdString().c_str());
     strcpy(cur->explain, ui->lineEdit_9->text().toStdString().c_str());
-
-    //直接赋值
-
-    //此处需加判断是否为空
-    //insert(&cur);//插入当前输入的route
-    //弹出如果退出
     QMessageBox msgBox;
     p_Route p1=findRouteByNum(cur->routeNum);
     if(p1==NULL)
@@ -46,7 +38,6 @@ void newDayEXPInfo::on_saveDayEXPInfoButton_clicked()
         this->close();
     }
     int routeNum=cur->routeNum;
-
     p_DayInfo p2=findDayInfoByOrder(routeNum,order);
     if(p2==NULL)
     {
@@ -66,7 +57,4 @@ void newDayEXPInfo::on_saveDayEXPInfoButton_clicked()
         msgBox.exec();
         this->close();
     }
-
-
-
 }

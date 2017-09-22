@@ -42,18 +42,24 @@ public:
     void showTree();
 
 private slots:
+    //展示所有信息
     void showAllslot();
+    //插入节点
     void newRouteSlot();
     void newDayInfoSlot();
     void newDayEXPInfoSlot();
-    //void showRouteslot();
-    void deleteRouteSlot();//获取所需删除信息
-    void Act_deleteRouteSlot();//执行删除操作
+
+    //获取所需删除信息
+    //Act表示执行删除操作
+    void deleteRouteSlot();
+    void Act_deleteRouteSlot();
     void deleteDayInfoSlot();
     void Act_deleteDayInfoSlot();
     void deleteDayEXPInfoSlot();
     void Act_deleteDayEXPInfoSlot();
 
+    //查询操作
+    //其中Act表示执行显示查询结果
     void showRouteslot();
     void Act_showRouteslot();
     void showDayInfoslot();
@@ -61,42 +67,32 @@ private slots:
     void showDayEXPInfoslot();
     void Act_showDayEXPInfoSlot();
 
+    //文件操作
     void saveToFileSlot();
     void loadFromFileSlot();
-
-
-    void clearSlot();
+    //退出窗口操作
     void quitBtnSLot();
-
-    void modifyRouteSlot();
-    void modifyDayInfoSlot();
-    void modifyDayEXPInfoSlot();
-
+    //统计报表
     void countEXPSlot();
 
-    void Mouse_position(QTreeWidgetItem* item);
-    void Show_info(QTreeWidgetItem* item,int n);
+    void Mouse_position(QTreeWidgetItem* item);//获取当前鼠标所在的链表级别及具体节点顺序
+    void Show_info(QTreeWidgetItem* item,int n);//显示当前鼠标所在节点的信息
 
-    void showTransInfoSlot();
+    void showTransInfoSlot();//查询小交通信息
     void Act_showTransInfoSlot();
 
-    void showResidenceSlot();
+    void showResidenceSlot();//查询住宿信息
     void Act_showResidenceSlot();
 
-    void showDressingIndexSlot();
+    void showDressingIndexSlot();//查询着装信息
     void Act_showDressingIndexSlot();
 
+    //排序操作
     void sortRouteSlot();
     void sortDayInfoSlot();
     void sortDayEXPInfoSlot();
 
-
-
-
-
-
-    void on_modifyButton_clicked();
-
+    void on_modifyButton_clicked();//执行修改操作
 
 private:
     Ui::MainWindow *ui;

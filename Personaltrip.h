@@ -24,7 +24,6 @@ typedef struct DressingIndex //穿衣指数结构体
 typedef struct Route //行程一级链表结构体
 {
     int routeNum;//行程编号
-    //char routeNum[10];//行程编号
     char routeName[20];//主要目的地名称
     char routeCountry[20];//目的地所属国家/省份
     DressingIndex dressingIndex;
@@ -41,40 +40,24 @@ typedef struct Route //行程一级链表结构体
     struct Route* nextRoute;//链表next指针
 }Route, *p_Route;
 
-
-
-
-
-
-
 typedef struct DayInfo //行程具体信息结构体
 {
     int routeNum;//所属行程编号
-    //char routeNum[10];//所属行程编号
     int order;//序号 2代表第二天  存成int
     char breakfastLoc[50];//早餐地点
     char morningScene[50];//上午景点
     char LunchLoc[50];//午餐地点
     char afternoonScene[50];//下午景点
     char dinnerLoc[50];//晚餐地点
-    //struct DayTransInfo* headDayTransInfo;//站点链表
     char transInfo[200];//小交通
     char residence[50];//住宿地点
     struct DayEXPInfo* hDayEXPInfo;
     struct DayInfo* nextDayInfo;//链表next指针
 }DayInfo, *p_DayInfo;
-/*
-typedef struct DayTransInfo //小交通链表
-{
-    //小交通链表
-    //从出发地搭乘公汽/出租/租车等到达目的地的文字说明，可描述一天内的多条路线
 
-}DayTransInfo, *p_DayTransInfo;
-*/
 typedef struct DayEXPInfo //每天消费信息
 {
     int routeNum;
-    //char routeNum[10];//所属行程编号
     int order;//序号 2代表第二天
     int serialNum;//顺序号
     char TxTime[20];//交易时间
@@ -84,9 +67,7 @@ typedef struct DayEXPInfo //每天消费信息
     char payment[10];//支付方式
     char explain[50];//说明
     struct DayEXPInfo* nextDayEXPInfo;
-    //此处可否使用bool
 }DayEXPInfo, *p_DayEXPInfo;
-
 
 extern p_Route hRoute;//声明为静态变量
 
@@ -121,11 +102,7 @@ bool deleteDayEXPInfo(int routeNum, int order, int serialNum);//单个删除
 bool saveToFile();
 bool loadFromFile();
 
-
-
 bool printAll();
-
-
 
 void sortRouteByNum(p_Route * pHead);//由于没有头结点，所以链表的头结点可能被更改
 void sawpRoutePf(p_Route A, p_Route B,p_Route* head);
@@ -141,9 +118,5 @@ int GetDayEXPInfoLength(p_DayEXPInfo pHead);
 
 p_DayInfo findTransInfoByScene(char Scene[50]);
 float findEXPByResidence(char Residence[50]);
-
-
-
-
 
 #endif // PERSONALTRIP_H

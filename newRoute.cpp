@@ -17,8 +17,7 @@ newRoute::~newRoute()
 
 void newRoute::on_saveRouteButton_clicked()
 {
-    p_Route cur = (p_Route)malloc(sizeof(Route));
-    //字符串赋值
+    p_Route cur = (p_Route)malloc(sizeof(Route));    //字符串赋值
     cur->routeNum=ui->lineEdit->text().toInt();//int
     strcpy(cur->routeName, ui->lineEdit_2->text().toStdString().c_str());
     strcpy(cur->routeCountry, ui->lineEdit_3->text().toStdString().c_str());
@@ -33,7 +32,6 @@ void newRoute::on_saveRouteButton_clicked()
     cur->totalTime=ui->lineEdit_12->text().toInt();//int  这个也是输入的
     cur->totalNum=ui->lineEdit_13->text().toInt();//int
     cur->totalPrice=ui->lineEdit_14->text().toFloat();//float
-    //此处需加判断是否为空
     QMessageBox msgBox;
     if(insertRoute(&cur))
     {
@@ -45,13 +43,6 @@ void newRoute::on_saveRouteButton_clicked()
         msgBox.setText("Save Fail!!!");
         msgBox.exec();
     }
-
-    //插入当前输入的route
-    //MainWindow().showTree();
-    //弹出如果退出
-
-
     this->close();
-
 }
 

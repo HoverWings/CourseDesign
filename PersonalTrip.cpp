@@ -4,7 +4,7 @@
 
 p_Route hRoute=NULL;
 
-//bool create
+
 bool creatRoute()//初始化链表
 {
     hRoute=(p_Route)malloc(sizeof(Route));
@@ -33,53 +33,6 @@ bool insertRoute(p_Route* curRoute) //当前节点
         msgBox.setInformativeText("请直接修改");
         msgBox.exec();
         return false;
-        /*
-        //msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-        //msgBox.setDefaultButton(QMessageBox::Save);
-        int ret = msgBox.exec();
-        switch (ret)
-        {
-          case QMessageBox::Save://覆盖
-                if(pre->nextRoute!=NULL)
-                {
-                    (*curRoute)->nextRoute=(pre)->nextRoute->nextRoute;
-                    deleteRoute((*curRoute)->routeNum);
-                    (pre)->nextRoute=*curRoute;
-                    //free((pre)->nextRoute);
-                    //deleterou
-                }
-                else
-                {
-                    (pre)->nextRoute=*curRoute;
-                }
-
-
-
-                return true;
-              break;
-          case QMessageBox::Discard:
-              return false;
-              break;
-          case QMessageBox::Cancel:
-              // Cancel was clicked
-              break;
-          default:
-              // should never be reached
-              break;
-        }
-         /*if(true)
-        {
-            (*curRoute)->nextRoute=(pre)->nextRoute->nextRoute;
-            free((pre)->nextRoute);
-            (pre)->nextRoute=*curRoute;
-            return true;
-        }
-        else
-        {
-            //显示窗口
-        }
-        */
-
     }
     else
     {
@@ -90,29 +43,6 @@ bool insertRoute(p_Route* curRoute) //当前节点
     return true;
 }
 //查找当前链表的前置位 然后插入
-
-
-//bool deleteRoute(p_Route cur)//这个是不能用的
-//{
-//	p_Route p = hRoute;//指向头结点
-//	if (hRoute == NULL)
-//	{
-//		//printf("sd");
-//		return false;
-//	}
-//	p_Route pre = NULL;
-//	p_Route tail = NULL;
-//	if (findRouteByNum(cur, &pre, &tail))
-//	{
-//		pre->nextRoute = cur->nextRoute;
-//		//处理二级节点
-//		free(cur);
-//	}
-//	else
-//	{
-//		printf("所删除的节点不存在");
-//	}
-//}
 
 bool deleteRoute(int routeNum)//reuturn 的问题
 {
@@ -350,11 +280,6 @@ bool insertDayInfo(p_DayInfo* cur)
         (*cur)->hDayEXPInfo = NULL;
         return true;
     }
-    //(tail)->nextDayInfo = *cur;
-    //(*cur)->nextDayInfo = NULL;
-    //(*cur)->hDayEXPInfo = NULL;
-    //return true;
-
 }
 
 
@@ -421,11 +346,6 @@ p_DayInfo findDayInfoByOrder(int routeNum, int order)// 二级链表 通过和�
     }
     return dayinfo;
 }
-
-
-
-
-
 
 bool deleteDayInfo(int routeNum, int order)//单个删除
 {
@@ -502,7 +422,6 @@ bool deleteDayInfo(int routeNum, int order)//单个删除
 }
 
 
-
 bool insertDayEXPInfo(p_Route* route, p_DayInfo* dayinfo, p_DayEXPInfo* cur)//需要写一些重载
 {
     if (*dayinfo == NULL)
@@ -538,6 +457,7 @@ bool insertDayEXPInfo(p_Route* route, p_DayInfo* dayinfo, p_DayEXPInfo* cur)//�
 
 }
 
+
 bool findDayEXPInfoByserialNum(p_DayInfo dayinfo, p_DayEXPInfo cur, p_DayEXPInfo* pre, p_DayEXPInfo* tail)//用于插入和删除
 {
     if (dayinfo == NULL)
@@ -562,6 +482,7 @@ bool findDayEXPInfoByserialNum(p_DayInfo dayinfo, p_DayEXPInfo cur, p_DayEXPInfo
     }
     return false;
 }
+
 
 p_DayEXPInfo findDayEXPInfoByserialNum(int routeNum,int order,int serialNum)//用于查询
 {
@@ -674,6 +595,7 @@ bool printAll()
     }
     return true;
 }
+
 //再封装一次
 bool insertDayEXPInfo(p_DayEXPInfo* cur)
 {

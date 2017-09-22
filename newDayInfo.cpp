@@ -27,10 +27,6 @@ void newDayInfo::on_saveDayInfoButton_clicked()
     strcpy(cur->dinnerLoc, ui->lineEdit_7->text().toStdString().c_str());
     strcpy(cur->transInfo, ui->lineEdit_8->text().toStdString().c_str());
     strcpy(cur->residence, ui->lineEdit_9->text().toStdString().c_str());
-
-    //直接赋值
-
-    //此处需加判断是否为空
     QMessageBox msgBox;
     if(insertDayInfo(&cur))
     {
@@ -42,9 +38,5 @@ void newDayInfo::on_saveDayInfoButton_clicked()
         msgBox.setText("Save fail");
         msgBox.exec();
     }
-    //insert(&cur);//插入当前输入的route
-    //弹出如果退出
-
-
     this->close();
 }
