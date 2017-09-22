@@ -14,11 +14,9 @@ bool creatRoute()//初始化链表
 
 bool insertRoute(p_Route* curRoute) //当前节点
 {
-    //bool ini=false;
     if(hRoute==NULL)
     {
         creatRoute();
-        //ini = true;
         hRoute = *curRoute;
         (*curRoute)->nextRoute = NULL;
         (*curRoute)->hDayInfo = NULL;
@@ -115,25 +113,6 @@ bool deleteRoute(int routeNum)//reuturn 的问题
 
     }
 }
-
-bool deleteRouteByrouteNum(int num)
-{
-    p_Route p = hRoute;
-    if (hRoute->routeNum == num)
-    {
-        hRoute = hRoute->nextRoute;
-        //do sth
-    }
-    else
-    {
-        p=findRouteByNum(num);
-        //删除某个二级节点
-    }
-    return true;
-}
-
-
-
 
 
 //通过行程编号找到
@@ -431,7 +410,6 @@ bool insertDayEXPInfo(p_Route* route, p_DayInfo* dayinfo, p_DayEXPInfo* cur)//�
     if ((*dayinfo)->hDayEXPInfo == NULL)
     {
         (*dayinfo)->hDayEXPInfo = *cur;
-        //(*cur)-> = NULL;
         (*cur)->nextDayEXPInfo = NULL;
         return true;
     }
@@ -448,8 +426,6 @@ bool insertDayEXPInfo(p_Route* route, p_DayInfo* dayinfo, p_DayEXPInfo* cur)//�
     }
     else
     {
-        //(tail)->nextDayInfo = *cur; //此处再说
-        //(*cur)->nextDayInfo = NULL;
         tail->nextDayEXPInfo = *cur;
         (*cur)->nextDayEXPInfo = NULL;
         return true;

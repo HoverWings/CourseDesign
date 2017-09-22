@@ -408,7 +408,7 @@ void MainWindow::deleteDayEXPInfoSlot()
 	routeNumLineEdit = new QLineEdit;
 	QLabel *order = new QLabel("序号");
 	orderLineEdit = new QLineEdit;
-	QLabel *serial = new QLabel("");
+    QLabel *serial = new QLabel("消费编号");
 	serialNumLineEdit = new QLineEdit;
 	QGridLayout *layout = new QGridLayout;
 	layout->addWidget(routNum, 0, 0, 1, 1);
@@ -588,7 +588,7 @@ void MainWindow::Act_showRouteslot()
 void MainWindow::showDayInfoslot()
 {
     deletedialog = new QDialog;
-    deletedialog->setWindowTitle("删除每日信息");
+    deletedialog->setWindowTitle("查询每日信息");
     QGroupBox *box = new QGroupBox(this);
     QPushButton *submitBtn = new QPushButton("确认");
     QPushButton *cancelBtn = new QPushButton("取消");
@@ -701,7 +701,7 @@ void MainWindow::Act_showDayInfoSlot()
 void MainWindow::showDayEXPInfoslot()
 {
     deletedialog = new QDialog;
-    deletedialog->setWindowTitle("删除每日信息");
+    deletedialog->setWindowTitle("查询每日信息");
     QGroupBox *box = new QGroupBox(this);
     QPushButton *submitBtn = new QPushButton("确认");
     QPushButton *cancelBtn = new QPushButton("取消");
